@@ -1,0 +1,37 @@
+@forward "normalize";
+@forward "variable";
+@import url("https://fonts.googleapis.com/css2?family=Inter&family=Roboto:wght@700&display=swap");
+
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+}
+
+html {
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: var(--ff-inter);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.title {
+  font-family: var(--ff-roboto);
+  font-weight: 700;
+  font-style: normal;
+  margin: 0;
+  padding: 0;
+}
+
+p {
+  margin: 0;
+  padding: 0;
+}
