@@ -33,6 +33,23 @@ module.exports = class {
     Response.otpSend(res);
   }
 
+  static async otpResend(req, res) {
+    const { error, value } = validate.otpResend(req.body);
+    if (error) return Response.badPayload(res, error.details[0].message);
+
+    const register = await Register.findByEmail(value.email);
+    if (!register) return Response.userNotRegister(res);
+
+    const isExpired = await register.checkExpired();
+    if (isExpired) return Response.otpExpired(res);
+
+    const isOTPSendRecent = await register.isRecentlySendOTP();
+    if (isOTPSendRecent) return Response.otpSendRecently(res);
+
+    await Register.resendOTP(register.email);
+    Response.otpResend(res);
+  }
+
   static async verify(req, res) {
     const { error, value } = validate.verify(req.body);
     if (error) return Response.badPayload(res, error.details[0].message);

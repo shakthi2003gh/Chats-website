@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const { send, findByEmail } = require("./utilities");
 const { deleteExpiredDoc, checkExpired } = require("./utilities");
+const { resendOTP, isRecentlySendOTP } = require("./utilities");
 
 const schema = new mongoose.Schema(
   {
@@ -20,8 +21,8 @@ const schema = new mongoose.Schema(
   { timestamps: true }
 );
 
-schema.statics = { findByEmail };
-schema.methods = { checkExpired };
+schema.statics = { findByEmail, resendOTP };
+schema.methods = { checkExpired, isRecentlySendOTP };
 
 schema.pre("save", send);
 schema.post("findOne", deleteExpiredDoc);

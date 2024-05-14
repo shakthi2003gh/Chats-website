@@ -19,6 +19,14 @@ module.exports = class {
     return Joi.object(schema).validate(payload);
   }
 
+  static otpResend(payload) {
+    const schema = {
+      email: Schema.email,
+    };
+
+    return Joi.object(schema).validate(payload);
+  }
+
   static verify(payload) {
     const schema = {
       email: Schema.email,

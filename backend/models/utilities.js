@@ -12,6 +12,21 @@ exports.send = async function () {
   await emailOTP(this.email, this.OTP);
 };
 
+exports.resendOTP = async function (email) {
+  const OTP = generateOTP();
+
+  await this.findOneAndUpdate({ email }, { OTP });
+  await emailOTP(email, OTP);
+};
+
+exports.isRecentlySendOTP = async function () {
+  const oneMin = 60000;
+  const { updatedAt } = this;
+  const now = new Date(Date.now());
+
+  return now - updatedAt < oneMin;
+};
+
 exports.checkExpired = async function () {
   const expireAt = 900000;
   const { updatedAt } = this;
