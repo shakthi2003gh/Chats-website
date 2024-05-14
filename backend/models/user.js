@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { findByEmail } = require("./utilities");
+const { findByEmail, generateAuthToken } = require("./utilities");
 
 const schema = new mongoose.Schema(
   {
@@ -31,5 +31,6 @@ const schema = new mongoose.Schema(
 );
 
 schema.statics.findByEmail = findByEmail;
+schema.methods.generateAuthToken = generateAuthToken;
 
 exports.User = mongoose.model("User", schema);

@@ -18,4 +18,13 @@ module.exports = class {
 
     return Joi.object(schema).validate(payload);
   }
+
+  static verify(payload) {
+    const schema = {
+      email: Schema.email,
+      OTP: Joi.string().required().length(4),
+    };
+
+    return Joi.object(schema).validate(payload);
+  }
 };

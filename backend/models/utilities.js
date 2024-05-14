@@ -1,3 +1,4 @@
+const jwt = require("jsonwebtoken");
 const { generateOTP } = require("../common/generateOTP");
 const { emailOTP } = require("../services/email");
 
@@ -24,4 +25,11 @@ exports.deleteExpiredDoc = async function (doc) {
 
   const isExpired = await doc.checkExpired();
   if (isExpired) await this.model.deleteOne({ _id: doc._id });
+};
+
+exports.generateAuthToken = async function () {
+  const { _id } = this;
+  const payload = { _id };
+
+  return jwt.sign(payload, process.env.JWT_KEY);
 };
