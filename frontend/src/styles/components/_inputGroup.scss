@@ -1,0 +1,135 @@
+.input-group {
+  --duration: 200ms;
+
+  position: relative;
+  width: 100%;
+
+  &:hover {
+    .eye {
+      display: block;
+    }
+  }
+
+  .container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background-color: var(--bg-secondary);
+    transition: outline-color var(--duration) ease-in-out;
+    border-radius: 4px;
+    outline-color: transparent;
+
+    &:has(:focus) {
+      outline: 2px solid var(--clr-primary);
+    }
+  }
+
+  label {
+    position: absolute;
+    top: 50%;
+    left: 1em;
+    text-transform: capitalize;
+    transform: translateY(-50%);
+    transition: all var(--duration) ease-in-out;
+
+    &.hidden {
+      top: -35%;
+      transform: translateY(0);
+      visibility: hidden;
+      z-index: -1;
+    }
+  }
+
+  input {
+    padding: 0.55em 1em;
+    width: 100%;
+    border: none;
+    background-color: transparent;
+    caret-color: var(--clr-primary);
+    border-radius: inherit;
+    outline: none;
+  }
+
+  button:has(svg.eye) {
+    height: 1.5em;
+    margin-right: 0.4em;
+    outline: none;
+
+    &:focus-visible {
+      opacity: 1;
+
+      .eye {
+        scale: 1.09;
+        outline: 2px solid var(--clr-text);
+      }
+    }
+  }
+
+  svg {
+    font-size: 1.5em;
+    margin-right: 0.22em;
+    flex-shrink: 0;
+
+    &.eye {
+      display: none;
+      font-size: 1.3em;
+      color: var(--clr-primary);
+    }
+
+    &.error {
+      color: var(--clr-danger);
+    }
+  }
+
+  .error-alert {
+    font-size: 0.8em;
+    text-align: right;
+    max-width: 85%;
+    height: 0;
+    margin-top: 5px;
+    color: var(--clr-danger);
+    transform: translateY(var(--error-height));
+    float: right;
+
+    &.active {
+      height: fit-content;
+    }
+  }
+
+  &.error,
+  &:has(:focus) {
+    margin-top: 10px;
+
+    label {
+      top: -35%;
+      font-size: 0.8em;
+      padding: 2px 4px;
+      border-radius: 2px;
+      color: var(--clr-light-600);
+      background-color: var(--clr-primary);
+      transform: translateY(0);
+      visibility: visible;
+      z-index: 0;
+    }
+
+    .eye {
+      display: block;
+    }
+  }
+
+  &.error {
+    .container {
+      color: var(--clr-danger);
+      outline: 2px solid var(--clr-danger) !important;
+    }
+
+    svg.eye {
+      color: var(--clr-danger);
+    }
+
+    &:has(:focus) label,
+    label {
+      background-color: var(--clr-danger);
+    }
+  }
+}
