@@ -1,0 +1,155 @@
+body:has(.auth-page),
+.auth-page {
+  background: var(--clr-gray);
+}
+
+.auth-page {
+  position: relative;
+  height: 100%;
+
+  .left-side,
+  .right-side {
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  .left-side {
+    position: absolute;
+    isolation: isolate;
+    height: min-content;
+
+    header {
+      position: relative;
+      padding: 1rem;
+      z-index: 2;
+    }
+
+    .bg {
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      display: none;
+      width: 200%;
+      height: 200%;
+      background-image: url("/doodles.png");
+      filter: blur(0.09vw) brightness(0.9);
+      transform: rotate(-55deg);
+    }
+  }
+
+  .right-side {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      width: fit-content;
+      max-width: 400px;
+      padding: 3rem 2rem;
+      margin-inline: auto;
+      overflow-y: auto;
+
+      &::-webkit-scrollbar {
+        visibility: hidden;
+        width: 0;
+      }
+    }
+  }
+
+  .heading {
+    font-size: 1rem;
+    text-align: center;
+    margin-bottom: 1rem;
+
+    h1 {
+      font-size: 2.2em;
+    }
+
+    p {
+      font-size: 0.83em;
+      max-width: 85%;
+      margin-top: 0.6rem;
+      margin-inline: auto;
+      opacity: 0.9;
+    }
+  }
+
+  form > .inputs {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+  }
+
+  .footer {
+    text-align: center;
+
+    .btn--primary {
+      width: 100%;
+    }
+
+    p {
+      font-size: 0.85em;
+      width: 80%;
+      max-width: 290px;
+      margin-top: 0.5rem;
+      margin-inline: auto;
+    }
+  }
+
+  .verification-form {
+    .heading {
+      margin-bottom: 0;
+    }
+
+    .btn--primary {
+      max-width: 290px;
+    }
+  }
+
+  @media (min-width: 678px) {
+    display: flex;
+
+    .left-side {
+      position: relative;
+      flex: 1 1 65%;
+      height: auto;
+      background-color: var(--clr-primary);
+
+      header {
+        padding: 1.5rem;
+
+        &::before {
+          position: absolute;
+          top: 0;
+          left: 0;
+          content: "";
+          width: 500px;
+          height: 250px;
+          background: linear-gradient(
+            155deg,
+            var(--clr-primary),
+            transparent 80%
+          );
+          z-index: -1;
+        }
+      }
+
+      .logo {
+        width: 130px;
+      }
+
+      .bg {
+        display: initial;
+      }
+    }
+
+    .right-side {
+      flex: 1 0 35%;
+      min-width: 340px;
+    }
+  }
+}

@@ -1,4 +1,11 @@
+import Auth from "./pages/auth";
+import { useUser } from "./state/user";
+
 function App() {
+  const { user } = useUser();
+
+  if (!user) return <Auth />;
+
   return (
     <>
       <h1>Hello world</h1>
