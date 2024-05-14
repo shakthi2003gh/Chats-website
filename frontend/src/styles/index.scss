@@ -1,6 +1,2 @@
 @forward "utilities";
-
-body {
-  color: var(--clr-text);
-  background-color: var(--bg);
-}
+@forward "components";
