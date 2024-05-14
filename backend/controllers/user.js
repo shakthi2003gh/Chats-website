@@ -60,4 +60,20 @@ module.exports = class {
 
     res.status(201).setHeader("Authorization", token).send(newUser);
   }
+
+  static async login(req, res) {
+    const { error, value } = validate.login(req.body);
+    if (error) return Response.badPayload(res, error.details[0].message);
+
+    const isExist = await User.findByEmail(value.email);
+    if (!isExist) return Response.invalidCredential(res);
+
+    const isVerified = await bcrypt.compare(value.password, isExist.password);
+    if (!isVerified) return Response.invalidCredential(res);
+
+    const user = await User.findById(isExist._id).select(defaultSelect);
+    const token = await user.generateAuthToken();
+
+    res.setHeader("Authorization", token).send(user);
+  }
 };

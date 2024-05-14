@@ -27,4 +27,13 @@ module.exports = class {
 
     return Joi.object(schema).validate(payload);
   }
+
+  static login(payload) {
+    const schema = {
+      email: Schema.email,
+      password: Schema.password,
+    };
+
+    return Joi.object(schema).validate(payload);
+  }
 };

@@ -18,6 +18,22 @@ exports.UserResponse = class extends OTPResponse {
     res.status(status).json(response);
   }
 
+  static invalidCredential(res) {
+    const status = 400;
+    const message = "Invalid email or password.";
+    const response = { status, message };
+
+    res.status(status).json(response);
+  }
+
+  static userNotExist(res) {
+    const status = 404;
+    const message = "The user with this email does not exist.";
+    const response = { status, message };
+
+    res.status(status).json(response);
+  }
+
   static userNotRegister(res, email) {
     const status = 404;
     const message = (email || "Email") + " not registered.";
