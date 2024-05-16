@@ -41,6 +41,17 @@ p {
   padding: 0;
 }
 
+.Toastify {
+  @media only screen and (max-width: 480px) {
+    .Toastify__toast-container {
+      left: auto;
+      right: calc(env(safe-area-inset-right) + 10px);
+      width: 85vw;
+      margin-top: 10px;
+    }
+  }
+}
+
 .loader .loader__bar {
   width: var(--loading-size, 1em);
   aspect-ratio: 1;

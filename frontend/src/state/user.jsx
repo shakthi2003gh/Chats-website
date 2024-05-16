@@ -45,7 +45,9 @@ export default function UserProvider({ children }) {
     userLocalDB
       .getUser()
       .then(setUser)
-      .finally(() => setLoading(false));
+      .finally(() => {
+        setTimeout(() => setLoading(false), 1500);
+      });
   }, []);
 
   const state = {
