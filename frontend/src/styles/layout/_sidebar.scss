@@ -1,0 +1,68 @@
+aside.side-bar {
+  --icon-size: 35px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: fit-content;
+  height: 100%;
+  background-color: var(--bg);
+
+  .logo-icon {
+    width: var(--icon-size);
+    margin: 1rem;
+  }
+
+  .navigation,
+  .actions {
+    display: grid;
+
+    a,
+    button {
+      display: grid;
+      place-content: center;
+      width: 100%;
+      aspect-ratio: 1;
+      padding: 0;
+      border-radius: 0;
+      outline: none;
+
+      .icon {
+        fill: var(--clr-text);
+        width: calc(var(--icon-size) - 4px);
+        aspect-ratio: 1;
+      }
+
+      &:is(:hover, :focus-visible) {
+        background-color: var(--hover);
+      }
+
+      &.active {
+        background-color: var(--clr-primary);
+        opacity: 1 !important;
+
+        &:focus-visible {
+          outline: 1px dotted var(--clr-light-700);
+          outline-offset: -4px;
+        }
+
+        .icon {
+          fill: var(--clr-light-600);
+        }
+      }
+    }
+  }
+
+  .actions {
+    padding-top: 1.5rem;
+    margin-top: auto;
+
+    button.active {
+      background-color: var(--clr-gray);
+
+      .icon {
+        fill: var(--clr-text);
+      }
+    }
+  }
+}

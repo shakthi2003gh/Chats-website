@@ -1,0 +1,10 @@
+.Chats {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1500px;
+  height: 100%;
+  margin-inline: auto;
+  overflow: hidden;
+}

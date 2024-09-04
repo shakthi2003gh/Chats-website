@@ -1,5 +1,9 @@
 a.link {
+  text-decoration: none;
+  color: inherit;
+
   &.link--primary {
+    text-decoration: underline;
     color: var(--clr-primary);
   }
 }

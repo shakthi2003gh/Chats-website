@@ -5,7 +5,7 @@ import logoGreen from "../assets/logo-green.svg";
 import logoBlue from "../assets/logo-blue.svg";
 import logoYellow from "../assets/logo-yellow.svg";
 
-export default function Logo({ theme }) {
+export default function Logo({ color, icon }) {
   const darkMode = true;
   const defaultLogo = darkMode ? logoDark : logoLight;
   const logos = {
@@ -15,11 +15,15 @@ export default function Logo({ theme }) {
     yellow: logoYellow,
   };
 
-  const src = theme && !!logos[theme] ? logos[theme] : defaultLogo;
+  const src = color && !!logos[color] ? logos[color] : defaultLogo;
 
   return (
-    <div className="logo">
-      <img src={src} alt="chats website logo" />
+    <div className={icon ? "logo-icon" : "logo"}>
+      <img
+        title="Chats - Messaging Website"
+        src={icon ? "/favicon.svg" : src}
+        alt="chats website"
+      />
     </div>
   );
 }

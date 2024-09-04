@@ -1,8 +1,11 @@
-export function classes(classObject) {
-  return Object.entries(classObject)
+export function classes(classObject, className = "") {
+  const str = Object.entries(classObject)
     .filter(([_key, value]) => !!value)
     .map(([key, _value]) => key)
     .join(" ");
+
+  if (className) return str + " " + className;
+  return str;
 }
 
 export function navigate(to, replace = false) {
