@@ -1,5 +1,10 @@
+import UIProvider from "./ui";
 import UserProvider from "./user";
 
 export default function StateProvider({ children }) {
-  return <UserProvider>{children}</UserProvider>;
+  return (
+    <UIProvider>
+      <UserProvider>{children}</UserProvider>
+    </UIProvider>
+  );
 }

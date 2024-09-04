@@ -4,3 +4,13 @@ export function classes(classObject) {
     .map(([key, _value]) => key)
     .join(" ");
 }
+
+export function navigate(to, replace = false) {
+  const url = window.location.pathname;
+  const params = new URL(window.location.href).search;
+  const path = to[0] !== "/" ? "/" + to : to;
+  const method = !!replace ? "replaceState" : "pushState";
+
+  if (url + params === path) return;
+  window.history[method]("", "", path);
+}
