@@ -4,6 +4,29 @@ import { FaEye } from "react-icons/fa";
 import { FaRegEyeSlash } from "react-icons/fa";
 import { classes } from "../utilities";
 
+export function Input({ type = "text", onChange = () => {}, ...rest }) {
+  const id = useId();
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+
+    onChange(value);
+  };
+
+  if (type === "textarea")
+    return (
+      <div className="input simple">
+        <textarea id={id} onChange={handleChange} {...rest} />
+      </div>
+    );
+
+  return (
+    <div className="input simple">
+      <input id={id} type="text" onChange={handleChange} {...rest} />
+    </div>
+  );
+}
+
 function InputGroup({ type, label, schema, canValidate, ...rest }, ref) {
   const id = useId();
   const [isEmpty, setEmpty] = useState(true);

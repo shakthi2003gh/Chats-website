@@ -98,7 +98,9 @@
 
   &.error,
   &:has(:focus) {
-    margin-top: 10px;
+    &:has(label) {
+      margin-top: 10px;
+    }
 
     label {
       top: -35%;
@@ -131,5 +133,46 @@
     label {
       background-color: var(--clr-danger);
     }
+  }
+}
+
+.input.simple {
+  width: 100%;
+
+  .container {
+    overflow: hidden;
+  }
+
+  input,
+  textarea {
+    width: 100%;
+    height: 100%;
+    padding: 0.55em 0.9em;
+    background-color: var(--clr-gray);
+    border-radius: 5px;
+    border: none;
+    outline: none;
+
+    &:focus {
+      background-color: var(--bg);
+      outline: 2px solid;
+    }
+
+    &::placeholder {
+      text-transform: capitalize;
+      color: #1e1e1ebf;
+
+      [dark] & {
+        color: #e7e7e7bf;
+      }
+    }
+
+    &:disabled {
+      opacity: 0.7;
+    }
+  }
+
+  textarea {
+    resize: none;
   }
 }
