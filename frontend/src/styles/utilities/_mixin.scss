@@ -1,0 +1,32 @@
+@mixin nav-link {
+  display: grid;
+  place-content: center;
+  width: 100%;
+  padding: 0;
+  border-radius: 0;
+  outline: none;
+
+  .icon {
+    fill: var(--clr-text);
+    width: calc(var(--icon-size) - 4px);
+    aspect-ratio: 1;
+  }
+
+  &:is(:hover, :focus-visible) {
+    background-color: var(--hover);
+  }
+
+  &.active {
+    background-color: var(--clr-primary);
+    opacity: 1 !important;
+
+    &:focus-visible {
+      outline: 1px dotted var(--clr-light-700);
+      outline-offset: -4px;
+    }
+
+    .icon {
+      fill: var(--clr-light-600);
+    }
+  }
+}
