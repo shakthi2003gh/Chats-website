@@ -5,8 +5,6 @@ const { Register } = require("../models/register");
 const validate = require("../validators/user");
 const Response = require("../response");
 
-const defaultSelect = "-password -createdAt -updatedAt -__v";
-
 module.exports = class {
   static async register(req, res) {
     const { error, value } = validate.register(req.body);
@@ -66,31 +64,34 @@ module.exports = class {
     const isVerifiedOTP = register.OTP === value.OTP;
     if (!isVerifiedOTP) return Response.invalidOTP(res);
 
-    const data = jwt.decode(register.dataToken);
-    const user = new User(data);
+    const userData = jwt.decode(register.dataToken);
+    const user = new User(userData);
 
-    await user.save();
+    await user.addDevice(value.userAgent);
     await Register.deleteOne({ email: value.email });
 
-    const newUser = await User.findById(user._id).select(defaultSelect);
-    const token = await newUser.generateAuthToken();
-
-    res.status(201).setHeader("Authorization", token).send(newUser);
+    const token = await user.generateAuthToken();
+    const data = await user.getLoginData();
+    res.status(201).setHeader("Authorization", token).send(data);
   }
 
   static async login(req, res) {
     const { error, value } = validate.login(req.body);
     if (error) return Response.badPayload(res, error.details[0].message);
 
-    const isExist = await User.findByEmail(value.email);
-    if (!isExist) return Response.invalidCredential(res);
+    const user = await User.findByEmail(value.email);
+    if (!user) return Response.invalidCredential(res);
 
-    const isVerified = await bcrypt.compare(value.password, isExist.password);
+    const isVerified = await bcrypt.compare(value.password, user.password);
     if (!isVerified) return Response.invalidCredential(res);
 
-    const user = await User.findById(isExist._id).select(defaultSelect);
-    const token = await user.generateAuthToken();
+    const authWithoutDevice = !(req.query.without === "device");
+    if (authWithoutDevice && !!user.device)
+      return Response.userAlreadyLoggedin(res, user.device);
+    await user.addDevice(value.userAgent);
 
-    res.setHeader("Authorization", token).send(user);
+    const token = await user.generateAuthToken();
+    const data = await user.getLoginData();
+    res.setHeader("Authorization", token).send(data);
   }
 };

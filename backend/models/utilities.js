@@ -1,20 +1,44 @@
+const _ = require("lodash");
 const jwt = require("jsonwebtoken");
+const UAParser = require("ua-parser-js");
 const { Message } = require("./message");
-const { generateOTP } = require("../common/generateOTP");
+const { getChats } = require("../helper/chat");
+const { getRandomNumbers } = require("../common/index.js");
 const { emailOTP } = require("../services/email");
 
 exports.findByEmail = function (email) {
   return this.findOne({ email });
 };
 
+exports.findByIdWithFriends = async function (user_id) {
+  const { Chat } = require("./chat");
+  const defaultNotSelect = "-password -createdAt -updatedAt -__v";
+
+  const user = await this.findById(user_id).select(defaultNotSelect);
+  if (!user) return {};
+
+  const find = { _id: { $in: user.personalChats } };
+  const chats = await Chat.find(find).select("members");
+
+  const friends = chats.reduce((friends, chat) => {
+    const chat_id = chat._id;
+    const friend_id = chat.members.filter((id) => id.toString() !== user_id)[0];
+
+    friends[friend_id] = { chat_id };
+    return friends;
+  }, {});
+
+  return { user, friends };
+};
+
 exports.send = async function () {
-  this.OTP = generateOTP();
+  this.OTP = getRandomNumbers();
 
   await emailOTP(this.email, this.OTP);
 };
 
 exports.resendOTP = async function (email) {
-  const OTP = generateOTP();
+  const OTP = getRandomNumbers();
 
   await this.findOneAndUpdate({ email }, { OTP });
   await emailOTP(email, OTP);
@@ -44,8 +68,8 @@ exports.deleteExpiredDoc = async function (doc) {
 };
 
 exports.generateAuthToken = async function () {
-  const { _id } = this;
-  const payload = { _id };
+  const { _id, device } = this;
+  const payload = { _id, device_id: device._id };
 
   return jwt.sign(payload, process.env.JWT_KEY);
 };
@@ -78,4 +102,28 @@ exports.createOne = async function (data) {
 
   await Promise.all(promises);
   return newChat;
+};
+
+exports.getLoginData = async function () {
+  const pick = ["_id", "name", "email", "image", "about"];
+  const user = _.pick(this, pick);
+  const personal = await getChats(this.personalChats, this._id);
+
+  const chat = { personal, group: {} };
+  return { user, chat };
+};
+
+exports.addDevice = async function (userAgent) {
+  const agent = new UAParser(userAgent);
+  const { device, browser } = agent.getResult();
+
+  this.device = {};
+  this.device._id = getRandomNumbers(10);
+  this.device.label = device.type || browser.name + " - Browser" || "desktop";
+  this.device.lastUsed = Date.now();
+  this.device.isOnline = true;
+
+  await this.save();
+
+  return this.device._id;
 };

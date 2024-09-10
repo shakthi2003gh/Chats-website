@@ -26,6 +26,38 @@ exports.UserResponse = class extends OTPResponse {
     res.status(status).json(response);
   }
 
+  static noToken(res) {
+    const status = 401;
+    const message = "Access denied. No token provided";
+    const response = { status, message };
+
+    res.status(status).json(response);
+  }
+
+  static invalidToken(res) {
+    const status = 401;
+    const message = "Access denied. Invalid token";
+    const response = { status, message };
+
+    res.status(status).json(response);
+  }
+
+  static unauthDevice(res, data) {
+    const status = 401;
+    const message = "Access denied. Device not authenticated.";
+    const response = { status, message, data };
+
+    res.status(status).json(response);
+  }
+
+  static userNotFound(res) {
+    const status = 404;
+    const message = "User not found.";
+    const response = { status, message };
+
+    res.status(status).json(response);
+  }
+
   static userNotExist(res) {
     const status = 404;
     const message = "The user with this email does not exist.";
@@ -47,6 +79,18 @@ exports.UserResponse = class extends OTPResponse {
     const message = "A user with this email already exists.";
     const response = { status, message };
 
+    res.status(status).json(response);
+  }
+
+  static userAlreadyLoggedin(res, device) {
+    const status = 409;
+    const { label, lastUsed, isOnline } = device;
+    const data = { label, lastUsed };
+    const message = isOnline
+      ? "You are currently logged in on another device."
+      : "User is already logged in on another device.";
+
+    const response = { status, message, data };
     res.status(status).json(response);
   }
 };

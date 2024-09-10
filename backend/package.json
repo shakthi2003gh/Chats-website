@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon --trace-warnings index.js"
   },
   "keywords": [],
   "author": "",
@@ -20,8 +20,12 @@
     "express-async-errors": "^3.1.1",
     "joi": "^17.13.0",
     "jsonwebtoken": "^9.0.2",
+    "lodash": "^4.17.21",
     "mongoose": "^8.3.2",
     "nodemailer": "^6.9.13",
-    "websocket": "^1.0.34"
+    "ua-parser-js": "^1.0.38"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
   }
 }
