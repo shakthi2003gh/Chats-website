@@ -83,6 +83,7 @@ function OTPInput({ digit = 4, onCatch = () => {}, onSubmit = () => {} }, ref) {
         <Button
           type="button"
           label="resend"
+          color="primary"
           theme="link"
           onClick={handleResend}
           loading={isResendLoading}

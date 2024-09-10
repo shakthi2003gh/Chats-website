@@ -9,8 +9,9 @@
 }
 
 html {
-  user-select: none;
   -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 body {
@@ -18,7 +19,14 @@ body {
   width: 100dvw;
   height: 100dvh;
   color: var(--clr-text);
-  background-color: var(--bg);
+  background-color: var(--clr-gray);
+  overflow: hidden;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
   overflow: hidden;
 }
 
@@ -61,8 +69,64 @@ p {
   animation: rotate 1s ease-in-out infinite;
 }
 
+.network-alerts {
+  .network-status,
+  .connection-status {
+    position: relative;
+    max-height: 0;
+    -webkit-user-select: none;
+    user-select: none;
+    transition: max-height 250ms ease-in-out;
+    isolation: isolate;
+    z-index: 1000;
+
+    &.show {
+      max-height: 24px;
+    }
+
+    .success,
+    .loading,
+    .error {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      width: 100%;
+      padding-block: 2px;
+      color: var(--clr-light-600);
+    }
+
+    .success {
+      background-color: var(--clr-green);
+
+      [color="green"] & {
+        filter: brightness(0.9);
+      }
+    }
+
+    .loading {
+      color: var(--clr-gray);
+      background-color: var(--clr-text);
+
+      .loading-icon {
+        animation: rotate 750ms ease-in-out infinite;
+      }
+    }
+
+    .error {
+      background-color: var(--clr-danger);
+    }
+  }
+}
 @keyframes rotate {
   100% {
     rotate: 360deg;
+  }
+}
+
+@keyframes slideAnimation {
+  to {
+    transform: translateX(0) translateY(0);
+    opacity: 1;
   }
 }

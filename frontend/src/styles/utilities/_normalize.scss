@@ -101,6 +101,7 @@ html {
   color: $color;
   -webkit-text-size-adjust: 100%; // 2
   -ms-text-size-adjust: 100%; // 2
+  text-size-adjust: 100%; // 2
 }
 
 // Addresses font-family inconsistency between 'textarea' and other form elements.

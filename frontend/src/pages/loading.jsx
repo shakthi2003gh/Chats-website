@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
+import { useUI } from "../state/ui";
 import Logo from "../components/logo";
 
 export default function Loading() {
+  const { color } = useUI();
+
   const [dotCount, setDotCount] = useState(1);
 
   useEffect(() => {
@@ -17,7 +20,7 @@ export default function Loading() {
   return (
     <main className="loading-page">
       <div className="container">
-        <Logo theme="pink" />
+        <Logo color={color.current} />
 
         <h1>{"Loading" + ".".repeat(dotCount)}</h1>
       </div>
