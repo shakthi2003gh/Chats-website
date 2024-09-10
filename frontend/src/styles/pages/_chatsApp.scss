@@ -52,6 +52,15 @@
     &:has(.chat) {
       display: flex;
       background-color: var(--bg);
+
+      .contact-info {
+        position: absolute;
+        inset: 0;
+        min-height: 400px;
+        animation: slideAnimation 130ms forwards ease;
+        transform: translateX(50%);
+        opacity: 0;
+      }
     }
 
     .welcome {
@@ -124,6 +133,16 @@
 
       .chat {
         flex: 1 1 60%;
+      }
+
+      .contact-info {
+        position: static;
+        flex: 1 1 30%;
+        max-width: 350px;
+        border-left: 1px solid var(--border);
+        animation: none;
+        transform: none;
+        opacity: 1;
       }
     }
   }

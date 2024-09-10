@@ -4,9 +4,11 @@ import Logo from "../components/logo";
 import Button from "../components/button";
 import Navigation from "../components/navigation";
 import { RenderChatList, RenderUserList } from "../components/renderList";
+import Chat from "./chat";
 import ListPanel from "./listPanel";
 import Profile from "./profile";
 import Settings from "./settings";
+import ContactInfo from "./contactInfo";
 
 export function Display1() {
   const { panel, floatingPanel, mediaQuery, accessibility } = useUI();
@@ -93,7 +95,11 @@ export function Display2() {
   return (
     <div className="display-2">
       {!!chat.current ? (
-        <Chat inert={accessibility.isContactOpen} />
+        <>
+          <Chat inert={accessibility.isContactOpen} />
+
+          {chat.current?.showContact && <ContactInfo />}
+        </>
       ) : (
         <section className="welcome">
           <Logo />
