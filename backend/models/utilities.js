@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const { Message } = require("./message");
 const { generateOTP } = require("../common/generateOTP");
 const { emailOTP } = require("../services/email");
 
@@ -47,4 +48,34 @@ exports.generateAuthToken = async function () {
   const payload = { _id };
 
   return jwt.sign(payload, process.env.JWT_KEY);
+};
+
+exports.addMessage = async function (data) {
+  const message = new Message({ chat: this.id, ...data });
+  this.messages.push(message._id);
+
+  await message.save();
+  await this.save();
+
+  const populate = { path: "author", select: "_id image name" };
+
+  return Message.findById(message._id)
+    .populate(populate)
+    .select("_id text image author readReceipt createdAt");
+};
+
+exports.createOne = async function (data) {
+  const { User } = require("./user");
+  const newChat = await this.create(data);
+
+  const promises = newChat.members.map(async (user_id) => {
+    const user = await User.findById(user_id);
+    if (!user) return null;
+    user.personalChats.push(newChat._id);
+
+    return await user.save();
+  });
+
+  await Promise.all(promises);
+  return newChat;
 };
