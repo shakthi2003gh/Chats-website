@@ -1,3 +1,4 @@
+const url = require("url");
 const jwt = require("jsonwebtoken");
 const { User } = require("../models/user");
 const { UserResponse } = require("../response/user");
@@ -30,6 +31,24 @@ exports.auth = async function (req, res, next) {
     next();
   } catch (error) {
     res.status(401).send({ message: "Invalid token.", error });
+  }
+};
+
+exports.authWS = async function (req, socket, cb) {
+  const respond401 = () => {
+    socket.write(`HTTP/1.1 401 unauthorized\r\n\r\n`);
+    socket.destroy();
+  };
+
+  try {
+    const { token } = url.parse(req.url, true).query;
+
+    const { error, ...data } = await authToken(token);
+    if (error) return respond401();
+
+    cb(data);
+  } catch {
+    respond401();
   }
 };
 
