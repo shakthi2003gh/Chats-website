@@ -111,4 +111,13 @@ module.exports = class {
 
     res.sendStatus(204);
   }
+
+  static async logout(req, res) {
+    const user = req.user;
+
+    user.device = null;
+    await user.save();
+
+    res.sendStatus(204);
+  }
 };
