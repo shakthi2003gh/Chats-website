@@ -94,4 +94,12 @@ module.exports = class {
     const data = await user.getLoginData();
     res.setHeader("Authorization", token).send(data);
   }
+
+  static async auth(req, res) {
+    const user = req.user;
+    const token = await user.generateAuthToken();
+    const data = await user.getLoginData();
+
+    res.setHeader("Authorization", token).send(data);
+  }
 };
