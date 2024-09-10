@@ -2,6 +2,7 @@
   position: relative;
   text-transform: capitalize;
   padding: 0.5em 1em;
+  color: inherit;
   background-color: transparent;
   outline-offset: -4px;
   border-radius: 6px;
@@ -12,6 +13,10 @@
     width: min-content;
     aspect-ratio: 1;
     padding: 0;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--clr-text);
   }
 
   &:active {
@@ -25,6 +30,12 @@
   &.btn--primary {
     color: var(--clr-light-600);
     background-color: var(--clr-primary);
+    outline-color: var(--clr-light-600);
+  }
+
+  &.btn--danger {
+    color: var(--clr-light-600);
+    background-color: var(--clr-danger);
     outline-color: var(--clr-light-600);
   }
 

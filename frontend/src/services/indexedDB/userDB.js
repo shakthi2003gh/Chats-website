@@ -18,18 +18,30 @@ class UserLocalDB {
     return this.db.collection("user").add(user, user._id);
   }
 
-  addToken(token) {
+  async addToken(token) {
+    await this.removeToken();
+
     return this.db.collection("token").add({ token });
   }
 
-  async removeUser() {
-    await this.removeToken();
+  updateUser(details) {
+    this.getUser().then(({ _id }) => {
+      this.db.collection("user").doc({ _id }).update(details);
+    });
+  }
 
-    return this.db.collection("user").delete();
+  removeUser() {
+    return this.getUser().then(async (user) => {
+      await this.removeToken();
+
+      if (user) return this.db.collection("user").doc({}).delete();
+    });
   }
 
   removeToken() {
-    return this.db.collection("token").delete();
+    return this.getToken().then((token) => {
+      if (token) return this.db.collection("token").doc({}).delete();
+    });
   }
 
   getSingleItem(collectionName) {

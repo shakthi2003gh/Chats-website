@@ -2,7 +2,11 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import userLocalDB from "../indexedDB/userDB";
 
+export const networkErrorMsg = "Network error. Check your connection.";
+
 export default class Request {
+  timeout;
+  isShowNetwortMessage = true;
   request = axios.create({ baseURL: import.meta.env.VITE_ENDPOINT });
   defaultCB = (resolve) => resolve();
 
@@ -18,15 +22,26 @@ export default class Request {
 
   handleCatch(reject) {
     const alert = (message) => {
-      toast.error(message);
+      if (message !== networkErrorMsg) toast.error(message);
       reject(message);
+
+      if (message === networkErrorMsg) {
+        if (this.isShowNetwortMessage) toast.error(message);
+        if (this.timeout) clearTimeout(this.timeout);
+
+        this.isShowNetwortMessage = false;
+        this.timeout = setTimeout(() => {
+          this.isShowNetwortMessage = true;
+        }, 10000);
+      }
     };
 
     return (res) => {
       const { response, code } = res;
-      const { message } = response?.data || {};
+      const { message, data, status } = response?.data || {};
 
-      if (code === "ERR_NETWORK") return alert("Network Error");
+      if (code === "ERR_NETWORK") return alert(networkErrorMsg);
+      if (data) return reject({ ...data, message, status });
       if (message) return alert(message);
 
       alert("Somthing went wrong on the server.");
@@ -38,7 +53,7 @@ export default class Request {
       const config = await this.getConfig();
 
       this.request
-        .post(this.basePath + path, payload, config)
+        .get(this.basePath + path, config)
         .then(cb(resolve))
         .catch(this.handleCatch(reject));
     });

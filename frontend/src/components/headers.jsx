@@ -2,16 +2,26 @@ import { RiChatNewFill } from "react-icons/ri";
 import { IoArrowBackSharp } from "react-icons/io5";
 import { IoMdClose } from "react-icons/io";
 import { useUI } from "../state/ui";
+import { useUser } from "../state/user";
 import Logo from "./logo";
 import Menu from "./menu";
 import Button from "./button";
 
 export function MobileHeader() {
+  const { floatingPanel } = useUI();
+  const { logout } = useUser();
+
+  const handleNavigate = (path) => () => {
+    floatingPanel.navigate(path);
+  };
+
   const menuOptions = [
-    <button>new chat</button>,
+    <button onClick={handleNavigate("new-chat")}>new chat</button>,
     <button>new group</button>,
-    <button>settings</button>,
-    <button className="danger">logout</button>,
+    <button onClick={handleNavigate("settings")}>settings</button>,
+    <button className="danger" onClick={logout}>
+      logout
+    </button>,
   ];
 
   return (
@@ -24,12 +34,18 @@ export function MobileHeader() {
 }
 
 export function PanelHeader({ type, title }) {
-  const { mediaQuery } = useUI();
+  const { mediaQuery, floatingPanel, chat } = useUI();
 
   const mainPanel = ["personal-chat", "group-chat", "calls"];
   const isMainPanel = mainPanel.includes(type);
 
   if (mediaQuery.isSmaller && isMainPanel) return <MobileHeader />;
+
+  const handleClose = () => {
+    if (type === "contact-info") return chat.toggleShowContact(false);
+
+    floatingPanel.navigate(isMainPanel ? "new-chat" : type);
+  };
 
   const handleBack = () => {
     history.back();
@@ -53,6 +69,7 @@ export function PanelHeader({ type, title }) {
         <Button
           title={isMainPanel ? "New Chat" : "Close"}
           className={isMainPanel ? "new-icon" : "close-icon"}
+          onClick={handleClose}
         >
           {isMainPanel ? <RiChatNewFill /> : <IoMdClose />}
         </Button>

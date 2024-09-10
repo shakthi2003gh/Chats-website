@@ -4,9 +4,6 @@ import userLocalDB from "../indexedDB/userDB";
 
 const request = new Request("/user");
 
-const loginSuccessFully = "Login successfully";
-const verifiedSuccessFully = "Verified successfully";
-
 function defaultCallBack(resolve) {
   return ({ data }) => {
     toast.success(data.message);
@@ -14,20 +11,30 @@ function defaultCallBack(resolve) {
   };
 }
 
-function loginCallBack(message) {
+function loginCallBack() {
   return (resolve) =>
     async ({ data, headers }) => {
       const token = headers.get("Authorization");
 
       await userLocalDB.addToken(token);
-      toast.success(message);
       resolve(data);
     };
 }
 
 export class UserHTTP {
-  static login(payload) {
-    return request.POST("/login", payload, loginCallBack(loginSuccessFully));
+  static auth() {
+    return request.POST("/auth", {}, loginCallBack());
+  }
+
+  static login(payload, withDevice = false) {
+    payload.userAgent = navigator.userAgent;
+
+    const path = withDevice ? "?without=device" : "";
+    return request.POST("/login" + path, payload, loginCallBack());
+  }
+
+  static logout() {
+    return request.POST("/logout", {}, defaultCallBack);
   }
 
   static register(payload) {
@@ -39,7 +46,13 @@ export class UserHTTP {
   }
 
   static verify(payload) {
-    const cb = loginCallBack(verifiedSuccessFully);
+    const cb = loginCallBack();
+    payload.userAgent = navigator.userAgent;
+
     return request.POST("/verify", payload, cb);
+  }
+
+  static update(payload) {
+    return request.PATCH("/", payload, defaultCallBack);
   }
 }

@@ -73,11 +73,16 @@ export default function Login({ schema, setMethod }) {
       </div>
 
       <div className="footer">
-        <Button label="login" loading={isLoading} />
+        <Button color="primary" label="login" loading={isLoading} />
 
         <p>
           Don't have an account?{" "}
-          <Link label="register" onClick={handleChangeMethod} />
+          <Link
+            to="/auth/register"
+            label="register"
+            color="primary"
+            onClick={handleChangeMethod}
+          />
         </p>
       </div>
     </form>

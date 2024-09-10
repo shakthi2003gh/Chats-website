@@ -86,11 +86,16 @@ export default function Register({ schema, setMethod }) {
       </div>
 
       <div className="footer">
-        <Button label="register" loading={isLoading} />
+        <Button color="primary" label="register" loading={isLoading} />
 
         <p>
           Already have an account?{" "}
-          <Link label="login" onClick={handleChangeMethod} />
+          <Link
+            to="/auth/login"
+            label="login"
+            color="primary"
+            onClick={handleChangeMethod}
+          />
         </p>
       </div>
     </form>

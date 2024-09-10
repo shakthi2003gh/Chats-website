@@ -1,3 +1,4 @@
+import { useUI } from "../state/ui";
 import logoDark from "../assets/logo-dark.svg";
 import logoLight from "../assets/logo-light.svg";
 import logoPink from "../assets/logo-pink.svg";
@@ -6,8 +7,9 @@ import logoBlue from "../assets/logo-blue.svg";
 import logoYellow from "../assets/logo-yellow.svg";
 
 export default function Logo({ color, icon }) {
-  const darkMode = true;
-  const defaultLogo = darkMode ? logoDark : logoLight;
+  const { theme } = useUI();
+
+  const defaultLogo = theme.isDark ? logoLight : logoDark;
   const logos = {
     pink: logoPink,
     green: logoGreen,

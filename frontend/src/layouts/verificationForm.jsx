@@ -70,11 +70,17 @@ export default function Verification({ setMethod }) {
       />
 
       <div className="footer">
-        <Button label="Verify" loading={isLoading} />
+        <Button color="primary" label="Verify" loading={isLoading} />
 
         <p>
           If you entered the wrong email, please{" "}
-          <Link label="register" onClick={handleChangeMethod} /> again.
+          <Link
+            to="/auth/register"
+            label="register"
+            color="primary"
+            onClick={handleChangeMethod}
+          />{" "}
+          again.
         </p>
       </div>
     </form>
