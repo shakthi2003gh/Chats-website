@@ -1,0 +1,151 @@
+@use "../utilities/mixin" as mixin;
+
+section.settings {
+  .panel-header {
+    background-color: var(--bg);
+    border-bottom: 1px solid var(--clr-gray);
+  }
+
+  .setting__btn,
+  .setting__link,
+  .setting__toggle {
+    @include mixin.settingHeader;
+    @include mixin.linkBorder;
+    @include mixin.settingHover;
+
+    &.danger {
+      color: red;
+
+      [dark] & {
+        color: var(--clr-danger);
+      }
+    }
+  }
+
+  .setting__link {
+    &:focus-visible {
+      .arrow {
+        opacity: 0.8;
+      }
+    }
+
+    .arrow {
+      flex-shrink: 0;
+      font-size: 1.5rem;
+      margin-left: auto;
+      transition: opacity 200ms ease-in;
+    }
+
+    @media (hover: hover) {
+      .arrow {
+        opacity: 0;
+      }
+
+      &:hover .arrow {
+        opacity: 0.8;
+      }
+    }
+  }
+
+  .setting__toggle {
+    padding-block: calc(1rem - 1px);
+
+    label.toggle {
+      margin-left: auto;
+    }
+  }
+
+  .setting__container {
+    @include mixin.linkBorder;
+
+    .header {
+      @include mixin.settingHeader;
+    }
+  }
+
+  .profile {
+    text-transform: none;
+    padding: 0.6rem 1rem;
+    margin-block: 0.5rem;
+    border: none;
+
+    .image-container {
+      width: 65px;
+
+      .no-image {
+        font-size: 1.9rem;
+      }
+    }
+
+    .profile__detail {
+      overflow: hidden;
+
+      .name {
+        font-size: 1.4rem;
+        margin-bottom: 0.2rem;
+      }
+
+      .about {
+        font-size: 0.8rem;
+        opacity: 0.65;
+      }
+
+      .name,
+      .about {
+        text-wrap: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+    }
+  }
+}
+
+section.appearance-settings {
+  .colors {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding-inline: 1rem;
+    margin-block: 1rem;
+
+    .color-btn {
+      --size: 60px;
+
+      all: unset;
+      width: var(--size);
+      height: var(--size);
+      background-color: var(--clr-primary);
+      border-radius: 6px;
+      text-indent: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+
+      &:is(:focus-visible, :hover) {
+        outline: 2px solid var(--clr-text);
+        scale: 1.05;
+      }
+
+      &.pink {
+        background-color: var(--clr-pink);
+      }
+
+      &.green {
+        background-color: var(--clr-green);
+      }
+
+      &.yellow {
+        background-color: var(--clr-yellow);
+      }
+
+      &.blue {
+        background-color: var(--clr-blue);
+      }
+
+      &.selected {
+        outline: 3px solid var(--clr-text);
+        scale: 1 !important;
+      }
+    }
+  }
+}

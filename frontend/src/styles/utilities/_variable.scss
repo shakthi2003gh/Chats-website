@@ -15,6 +15,8 @@
   --clr-light-gray: #dfdfdf;
   --clr-dark-gray: #2e2e2e;
 
+  color-scheme: light;
+
   --clr-primary: var(--clr-pink);
   --clr-danger: #dc3545;
   --clr-text: var(--clr-dark-600);
@@ -23,4 +25,31 @@
   --border: var(--clr-border-light);
   --bg: var(--clr-light-700);
   --bg-secondary: var(--clr-light-600);
+
+  [color="pink"] {
+    --clr-primary: var(--clr-pink);
+  }
+
+  [color="green"] {
+    --clr-primary: var(--clr-green);
+  }
+
+  [color="yellow"] {
+    --clr-primary: var(--clr-yellow);
+  }
+
+  [color="blue"] {
+    --clr-primary: var(--clr-blue);
+  }
+
+  [dark] {
+    color-scheme: dark;
+
+    --clr-text: var(--clr-light-600);
+    --clr-gray: var(--clr-dark-gray);
+    --hover: #272727;
+    --border: var(--clr-border-dark);
+    --bg: var(--clr-dark-700);
+    --bg-secondary: var(--clr-dark-600);
+  }
 }

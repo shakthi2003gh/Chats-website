@@ -44,3 +44,28 @@
   border-bottom-style: solid;
   outline: none;
 }
+
+@mixin settingHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1.1rem;
+  text-align: start;
+  text-transform: capitalize;
+  text-decoration: none;
+  width: 100%;
+  padding: 1rem 1.2rem;
+  color: inherit;
+  background-color: transparent;
+
+  .icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+}
+
+@mixin settingHover {
+  &:is(:hover, :focus-visible) {
+    background-color: var(--hover);
+  }
+}
