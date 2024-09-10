@@ -102,4 +102,13 @@ module.exports = class {
 
     res.setHeader("Authorization", token).send(data);
   }
+
+  static async update(req, res) {
+    const { error, value } = validate.update(req.body);
+    if (error) return Response.badPayload(res, error.details[0].message);
+
+    await User.findByIdAndUpdate(req.user._id, value);
+
+    res.sendStatus(204);
+  }
 };

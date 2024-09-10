@@ -7,5 +7,6 @@ router.post("/register", Controller.register);
 router.post("/verify", Controller.verify);
 router.post("/login", Controller.login);
 router.post("/auth", auth, Controller.auth);
+router.patch("/", auth, Controller.update);
 
 exports.users = router;
