@@ -8,9 +8,13 @@ module.exports = function (app) {
     .then(() => {
       startup("Connect to MongoDB...");
 
-      app.listen(PORT, () => {
+      const server = app.listen(PORT, (err) => {
+        if (err) return error(err);
+
         startup(`Listening on port ${PORT}...`);
       });
+
+      require("./webSocket")(server);
     })
     .catch((err) => {
       error("Couldn't connect to MongoDB...");
