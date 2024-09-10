@@ -11,6 +11,7 @@ export function useUI() {
 export default function UIProvider({ children }) {
   const panels = ["personal-chat", "group-chat", "calls"];
   const [currentPanel, setCurrentPanel] = useState(panels[0]);
+  const [currentChat, setCurrentChat] = useState(null);
   const isSmallerDevice = !useMediaQuery(475);
   const isSmallDevice = !useMediaQuery(678);
 
@@ -22,9 +23,10 @@ export default function UIProvider({ children }) {
   };
 
   const panel = { current: currentPanel, navigate };
+  const chat = { current: currentChat, setCurrent: setCurrentChat };
   const mediaQuery = { isSmaller: isSmallerDevice, isSmall: isSmallDevice };
 
-  const state = { panel, mediaQuery };
+  const state = { panel, mediaQuery, chat };
 
   return <UIContext.Provider value={state}>{children}</UIContext.Provider>;
 }

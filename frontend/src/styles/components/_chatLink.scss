@@ -1,0 +1,94 @@
+@use "../utilities/mixin" as mixin;
+
+.chat-link {
+  @include mixin.linkBorder;
+
+  display: flex;
+  gap: 0.6rem;
+  width: 100%;
+  padding-block: 0.65rem;
+  outline: none !important;
+  cursor: pointer;
+
+  .details {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    width: 100%;
+    overflow: hidden;
+
+    .head,
+    .foot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .head {
+      .name {
+        max-width: 65%;
+        text-transform: capitalize;
+      }
+
+      .timestamp {
+        font-size: 0.8em;
+        width: fit-content;
+        max-width: 150px;
+      }
+    }
+
+    .foot {
+      gap: 8px;
+
+      .last-message {
+        font-size: 0.85em;
+        width: 90%;
+        opacity: 0.8;
+      }
+
+      .seen-text {
+        align-self: flex-end;
+        font-size: 0.75rem;
+        opacity: 0.7;
+      }
+
+      .read-receipt {
+        display: grid;
+        place-content: center;
+        width: 16px;
+        aspect-ratio: 1;
+
+        .failed {
+          font-size: 1.04rem;
+        }
+      }
+    }
+
+    .name,
+    .last-message,
+    .timestamp {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+  }
+
+  @media (hover: hover) {
+    &:is(:hover, :focus) {
+      background-color: var(--hover);
+
+      .image-container {
+        background-color: var(--bg);
+      }
+    }
+  }
+
+  &.active {
+    background-color: var(--clr-gray);
+
+    .image-container {
+      background-color: var(--bg-secondary);
+    }
+  }
+}

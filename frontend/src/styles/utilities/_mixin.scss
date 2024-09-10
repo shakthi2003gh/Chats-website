@@ -30,3 +30,17 @@
     }
   }
 }
+
+@mixin linkBorder {
+  border: 0;
+  border-image: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0) 20%,
+      var(--clr-gray),
+      rgba(255, 255, 255, 0) 80%
+    )
+    30;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  outline: none;
+}
