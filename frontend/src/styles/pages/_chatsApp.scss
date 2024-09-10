@@ -49,6 +49,11 @@
     display: none;
     width: 100%;
 
+    &:has(.chat) {
+      display: flex;
+      background-color: var(--bg);
+    }
+
     .welcome {
       display: grid;
       place-content: center;
@@ -59,6 +64,18 @@
 
       .logo {
         width: 150px;
+      }
+    }
+
+    .chat {
+      transform: translateX(10%);
+      opacity: 0;
+      animation: slideAnimation 80ms forwards linear;
+
+      @media (min-width: 678px) {
+        transform: translateX(0);
+        animation: none;
+        opacity: 1;
       }
     }
   }
@@ -94,6 +111,20 @@
       flex: 1 1 60%;
       position: static;
       display: block;
+
+      &:has(.chat) {
+        position: relative;
+      }
+    }
+  }
+
+  @media (min-width: 1111px) {
+    .display-2:has(.chat) {
+      position: static;
+
+      .chat {
+        flex: 1 1 60%;
+      }
     }
   }
 }

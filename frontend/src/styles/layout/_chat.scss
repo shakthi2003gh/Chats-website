@@ -1,0 +1,171 @@
+section.chat {
+  display: flex;
+  flex-direction: column;
+  container-type: inline-size;
+  width: 100%;
+  height: var(--height, 100%);
+  background-color: var(--clr-gray);
+  overflow: hidden;
+
+  header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--bg);
+    border-bottom: 1px solid var(--border);
+
+    button.back {
+      display: grid;
+      place-content: center;
+      font-size: 1.4rem;
+      padding: 1rem;
+      border-radius: 0;
+      // outline: none;
+
+      &:focus-visible {
+        background-color: var(--hover);
+      }
+
+      @media (hover: hover) {
+        &:hover {
+          background-color: var(--hover);
+        }
+      }
+    }
+
+    .image-container {
+      width: 40px;
+
+      .no-image {
+        font-size: 1.25em;
+      }
+    }
+
+    .name {
+      font-size: 1.2rem;
+      white-space: nowrap;
+      text-transform: capitalize;
+      text-overflow: ellipsis;
+      width: 80%;
+      margin-left: 0.5rem;
+      overflow: hidden;
+    }
+
+    .menu {
+      margin-right: 1rem;
+      margin-left: auto;
+    }
+
+    @media (min-width: 678px) {
+      padding: 0.5rem 1rem;
+
+      button.back {
+        display: none;
+      }
+
+      .menu {
+        margin-right: 0;
+      }
+    }
+  }
+
+  .group-messages {
+    --back-drop: #1c1c1c00;
+
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    -webkit-user-select: text;
+    user-select: text;
+    height: 100%;
+    padding: 1.2rem 1rem;
+    background: linear-gradient(var(--back-drop), var(--back-drop)),
+      url("/doodles.png");
+    background-size: 160%;
+    background-position: center;
+    animation: scrollBehavior forwards;
+    animation-delay: 0.5s;
+    overscroll-behavior: contain;
+    overflow: hidden scroll;
+
+    .group {
+      position: relative;
+      height: fit-content;
+      isolation: isolate;
+
+      &:first-child {
+        margin-top: auto;
+      }
+
+      .timestamp {
+        position: sticky;
+        top: 0;
+        display: block;
+        font-size: 0.8rem;
+        text-transform: capitalize;
+        -webkit-user-select: none;
+        user-select: none;
+        width: fit-content;
+        padding-block: 0.24em;
+        padding-inline: 0.6em;
+        margin-inline: auto;
+        margin-bottom: 1.2rem;
+        color: var(--clr-dark-700);
+        background-color: var(--clr-light-700);
+        filter: brightness(1.2);
+        border-radius: 4px;
+        z-index: 2;
+      }
+    }
+
+    .messages {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .btn.scroll-down {
+      position: fixed;
+      right: calc(50% - 24px);
+      bottom: 5rem;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--clr-light-700);
+      background-color: var(--clr-primary);
+      animation: slideAnimation 200ms forwards ease;
+      transform: translateY(100%);
+      filter: brightness(1.1);
+      opacity: 0;
+
+      span {
+        font-size: 0.87rem;
+      }
+    }
+
+    @container (min-width: 678px) {
+      gap: 1.7rem;
+      padding: 1.5rem 4rem;
+      background-size: cover;
+
+      .timestamp {
+        font-size: 0.9rem;
+      }
+
+      .messages {
+        gap: 1.2rem;
+      }
+    }
+
+    [dark] & {
+      --back-drop: #181818d3;
+    }
+  }
+}
+
+@keyframes scrollBehavior {
+  to {
+    scroll-behavior: smooth;
+  }
+}

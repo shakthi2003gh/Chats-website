@@ -88,11 +88,17 @@ export function Display1() {
 }
 
 export function Display2() {
+  const { chat, accessibility } = useUI();
+
   return (
     <div className="display-2">
-      <section className="welcome">
-        <Logo />
-      </section>
+      {!!chat.current ? (
+        <Chat inert={accessibility.isContactOpen} />
+      ) : (
+        <section className="welcome">
+          <Logo />
+        </section>
+      )}
     </div>
   );
 }
