@@ -1,0 +1,98 @@
+.compose-area {
+  position: relative;
+  container-type: inline-size;
+  width: 100%;
+  background-color: var(--bg);
+  border-top: 1px solid var(--border);
+
+  .selected-image {
+    display: none;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 0.6rem;
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+
+    &:has(img) {
+      display: flex;
+    }
+
+    img {
+      width: 50px;
+      aspect-ratio: 1;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+
+    input {
+      position: absolute;
+      display: none;
+    }
+
+    span {
+      text-transform: capitalize;
+      opacity: 0.8;
+    }
+
+    button.trash {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-left: auto;
+
+      span {
+        display: none;
+      }
+    }
+
+    @container (min-width: 475px) {
+      button.trash span {
+        display: inline;
+      }
+    }
+  }
+
+  .main {
+    display: flex;
+    width: 100%;
+    padding-inline: 0.5rem;
+
+    .input,
+    .btn {
+      margin: 0.7rem 0.5rem;
+    }
+
+    .btn {
+      padding: 0 0.5rem;
+      color: var(--clr-primary);
+      outline-offset: 0;
+
+      &:is(.emoji, .image) {
+        margin-inline: 0;
+      }
+
+      &.image {
+        color: var(--clr-text);
+
+        &:disabled {
+          opacity: 0.5 !important;
+        }
+      }
+
+      &:disabled {
+        color: var(--clr-text);
+      }
+    }
+
+    svg {
+      display: grid;
+      place-content: center;
+      font-size: 1.8rem;
+    }
+  }
+
+  em-emoji-picker {
+    width: 100%;
+    max-height: 300px;
+  }
+}
