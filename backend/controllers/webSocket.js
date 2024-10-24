@@ -103,19 +103,21 @@ module.exports = class {
   }
 
   onMessage(server, ws) {
-    return async function (payload) {
+    return async function ({ chatType, message: payload }) {
       const { error, value } = validate.message(payload);
       if (error) {
         const response = { type: "error", data: error.details[0] };
         return send(ws, response);
       }
 
-      const result = await storeMessage({ ...value, author_id: ws._id });
-      const { data, echoData, receiver_id, isNewChat } = result;
+      const message = { ...value, author_id: ws._id };
+      const result = await storeMessage({ chatType, message, user_id: ws._id });
+      const { data, echoData, receiver_ids, isNewChat, error: err } = result;
+      if (err) return send(ws, { type: "error", data: { message: err } });
 
       server.clients.forEach((client) => {
         const isSelf = ws === client;
-        const isReceiver = receiver_id === client._id;
+        const isReceiver = receiver_ids.includes(client._id);
         const isOnline = client.readyState === WebSocket.OPEN;
 
         if (isSelf && isOnline) {

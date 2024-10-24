@@ -19,6 +19,7 @@ module.exports = class {
 
   static readReceipt(payload) {
     const schema = {
+      chatType: Joi.string().required().valid("personal-chat", "group-chat"),
       message_id: Joi.string().hex().length(24).required(),
       status: Joi.string().required().valid("delivered", "seen"),
     };

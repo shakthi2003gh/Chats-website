@@ -30,9 +30,25 @@ const schema = new mongoose.Schema(
       ref: "User",
     },
     readReceipt: {
-      type: String,
-      enum: ["sent", "delivered", "seen"],
-      default: "sent",
+      status: {
+        type: String,
+        enum: ["sent", "delivered", "seen"],
+        default: "sent",
+      },
+      users: [
+        {
+          user_id: {
+            type: mongoose.Types.ObjectId,
+            ref: "User",
+            required: true,
+          },
+          status: {
+            type: String,
+            enum: ["sent", "delivered", "seen"],
+            default: "sent",
+          },
+        },
+      ],
     },
   },
   { timestamps: true }
