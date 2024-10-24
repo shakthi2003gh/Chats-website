@@ -1,10 +1,8 @@
 import { useRef, useState } from "react";
 import { MdFolder } from "react-icons/md";
-import { useUser } from "../state/user";
-import { uploadProfile } from "../services/firebase/storage";
 
 export default function ProfileImage(props) {
-  const { image, placeholder = "No image", isOnline, ...rest } = props;
+  const { image, placeholder, isOnline, ...rest } = props;
 
   return (
     <div className="profile-img" {...rest}>
@@ -12,7 +10,7 @@ export default function ProfileImage(props) {
         {image ? (
           <img src={image} alt="" />
         ) : (
-          <div className="no-image">{placeholder[0]}</div>
+          <div className="no-image">{placeholder?.[0] || "N"}</div>
         )}
       </div>
 
@@ -21,12 +19,11 @@ export default function ProfileImage(props) {
   );
 }
 
-export function ProfileImageUploader() {
-  const { user, update } = useUser();
+export function ProfileImageUploader(props) {
+  const { image, placeholder, onUpload } = props;
+
   const imageRef = useRef();
   const [isLoading, setLoading] = useState(false);
-
-  const { _id, name, image } = user || {};
 
   const handleSelectImagePopup = () => {
     if (!imageRef.current) return;
@@ -38,30 +35,28 @@ export function ProfileImageUploader() {
     const image = e.target.files[0];
     if (!image) return;
 
+    if (typeof onUpload !== "function") return;
     setLoading(true);
-
-    uploadProfile(_id, image)
-      .then((url) => update({ image: url }))
-      .catch(() => {})
-      .finally(() => {
-        imageRef.current.value = null;
-        setLoading(false);
-      });
+    onUpload(image).finally(() => {
+      imageRef.current.value = null;
+      setLoading(false);
+    });
   };
 
   return (
-    <div className="profile__image">
+    <div className="profile-image-uploader">
       <ProfileImage
         image={image}
-        placeholder={name}
+        placeholder={placeholder}
         onClick={handleSelectImagePopup}
       />
 
       <input
         ref={imageRef}
         type="file"
+        title="image upload input"
         id="profile-image"
-        name="profileImage"
+        name="profile image"
         accept="image/*"
         onChange={handleUpload}
         hidden
@@ -74,7 +69,9 @@ export function ProfileImageUploader() {
       )}
 
       <button
+        type="button"
         className="edit-btn"
+        title="Upload Image"
         onClick={handleSelectImagePopup}
         disabled={isLoading}
       >

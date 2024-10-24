@@ -7,10 +7,12 @@ import Button from "../components/button";
 import { PanelHeader } from "../components/headers";
 import { ProfileImageUploader } from "../components/profileImage";
 import RenderSettings from "../components/renderSettings";
+import { uploadProfile } from "../services/firebase/storage";
 
 export default function Profile() {
   const { display } = usePopup();
   const { user, update } = useUser();
+  const { _id, name, image } = user || {};
 
   const handleEdit = (label) => () => {
     const value = user[label] || "";
@@ -21,6 +23,15 @@ export default function Profile() {
 
     const data = { name: label, heading: "Enter your " + label, value, method };
     display({ type: "edit", data, onConfirm });
+  };
+
+  const handleUpload = async (image) => {
+    if (!(image && typeof image === "object")) return;
+
+    try {
+      const url = await uploadProfile(_id, image);
+      return update({ image: url });
+    } catch {}
   };
 
   const details = [
@@ -57,7 +68,11 @@ export default function Profile() {
     <section aria-label="Profile Panel" className="floating-panel profile">
       <PanelHeader type="settings" title="Profile" />
 
-      <ProfileImageUploader />
+      <ProfileImageUploader
+        image={image}
+        placeholder={name}
+        onUpload={handleUpload}
+      />
 
       <RenderSettings settings={details} clabel="detail" />
     </section>

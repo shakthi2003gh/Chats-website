@@ -73,6 +73,27 @@ function InputGroup({ type, label, schema, canValidate, ...rest }, ref) {
     if (value?.trim() || defaultValue?.trim()) setEmpty(false);
   }, [canValidate]);
 
+  if (type === "textarea")
+    return (
+      <div className={className}>
+        <div className="container">
+          {label && (
+            <label htmlFor={id} className={labelClass}>
+              {label}
+            </label>
+          )}
+
+          <textarea id={id} ref={ref} onChange={handleChange} {...rest} />
+
+          {inputError && <MdError title="error" className={errorIconClass} />}
+        </div>
+
+        <span title={inputError} className={alertClass}>
+          {inputError}
+        </span>
+      </div>
+    );
+
   return (
     <div className={className}>
       <div className="container">

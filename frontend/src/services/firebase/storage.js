@@ -20,6 +20,12 @@ export async function uploadProfile(profileName, image) {
   return uploadTemplate(storageRef, image);
 }
 
+export async function uploadGroupImage(image) {
+  const storageRef = ref(storage, `group/profile-${Date.now()}`);
+
+  return uploadTemplate(storageRef, image);
+}
+
 export async function uploadMessageImage(chat_id, image) {
   const storageRef = ref(storage, `chat/${chat_id}/message-${Date.now()}`);
 

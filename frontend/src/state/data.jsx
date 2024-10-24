@@ -6,6 +6,7 @@ import { navigate } from "../utilities";
 import { PublicHTTP } from "../services/http/public";
 import chatsLocalDB from "../services/indexedDB/chatsDB";
 import { uploadMessageImage } from "../services/firebase/storage";
+import { uploadGroupImage } from "../services/firebase/storage";
 
 const DataContext = createContext(null);
 
@@ -88,27 +89,37 @@ export default function DataProvider({ children }) {
     });
   };
 
-  const setPersonalChats = (value, sync = false) => {
-    const isFunction = typeof value === "function";
+  const getChatProps = (chatType) => {
+    if (chatType === "group-chat")
+      return { setter: setGroups, collectionName: "groupChats" };
 
-    setChats((prev) => {
-      if (isFunction) {
-        const chats = value(prev).map(checkReadRecipt);
-        chatsLocalDB.addChats(chats);
+    return { setter: setChats, collectionName: "personalChats" };
+  };
+
+  const setChatTemplate =
+    (chatType = "personal-chat") =>
+    (value, sync = false) => {
+      const isFunction = typeof value === "function";
+      const { setter, collectionName } = getChatProps(chatType);
+
+      setter((prev) => {
+        if (isFunction) {
+          const chats = value(prev).map(checkReadRecipt(chatType));
+          chatsLocalDB.addChats(chats, collectionName);
+          return chats;
+        }
+
+        const chats = value.map(checkReadRecipt(chatType));
+        if (sync) syncLocalMessages(prev, chats);
+
+        chatsLocalDB.addChats(chats, collectionName);
         return chats;
-      }
+      });
+    };
 
-      const chats = value.map(checkReadRecipt);
-      if (sync) syncLocalMessages(prev, chats);
+  const setPersonalChats = setChatTemplate("personal-chat");
 
-      chatsLocalDB.addChats(chats);
-      return chats;
-    });
-  };
-
-  const setGroupChats = (group) => {
-    setGroups(group);
-  };
+  const setGroupChats = setChatTemplate("group-chat");
 
   const handleSetPeople = (users) => {
     const filteredUser = users.filter(({ _id: id }) => {
@@ -132,6 +143,24 @@ export default function DataProvider({ children }) {
     return personalChats.find(findChat) || newChat();
   };
 
+  const createGroup = (data) => {
+    const isConnected = socket && socket.readyState === socket.OPEN;
+
+    return new Promise(async (resolve, reject) => {
+      try {
+        if (!isConnected) reject();
+        if (data?.image) data.image = await uploadGroupImage(data.image);
+
+        const payload = { type: "create-group", data };
+        socket.send(JSON.stringify(payload));
+
+        resolve();
+      } catch {
+        reject();
+      }
+    });
+  };
+
   const addNewChat = (data) => {
     const { _id: chat_id, user_id } = data;
     const url = window.location.pathname;
@@ -143,9 +172,14 @@ export default function DataProvider({ children }) {
 
     if (!(panelName === "new-chat" && receiver_id === user_id)) return;
 
-    panel.navigate("personal-chat");
-    chat.setCurrent({ _id: chat_id });
-    navigate("/personal-chat/" + chat_id, true);
+    panel.navigate(personalChat);
+    chat.setCurrent({ _id: chat_id, type: personalChat });
+    navigate(`/${personalChat}/` + chat_id, true);
+  };
+
+  const addNewGroup = (data) => {
+    data.unreadCount = 0;
+    setGroupChats((prev) => [...prev, data]);
   };
 
   const addMessage = ({ temp_id, chat_id, message }, type) => {
@@ -331,7 +365,7 @@ export default function DataProvider({ children }) {
   }, []);
 
   const m = { handleReceiveMessage, reset: handleReset, updateMessageStatus };
-  const methods = { getChat, sendMessage, resendMessage, ...m };
+  const methods = { getChat, createGroup, sendMessage, resendMessage, ...m };
   const chats = { personalChats, groupChats, setPersonalChats, setGroupChats };
   const state = { chats, people, isLoading, ...methods };
 

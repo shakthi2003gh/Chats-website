@@ -6,6 +6,7 @@ import Navigation from "../components/navigation";
 import { RenderChatList, RenderUserList } from "../components/renderList";
 import Chat from "./chat";
 import ListPanel from "./listPanel";
+import NewGroup from "./newGroup";
 import Profile from "./profile";
 import Settings from "./settings";
 import ContactInfo from "./contactInfo";
@@ -15,6 +16,7 @@ export function Display1() {
   const { people, chats, isLoading } = useData();
   const { personalChats, groupChats } = chats || {};
   const { isChatOpen, isFloatingPanelOpen } = accessibility || {};
+  const currentPanel = panel.current;
   const currentFloatingPanel = floatingPanel.current;
 
   const handleSearch = (data, search) => {
@@ -27,20 +29,20 @@ export function Display1() {
       title: "Personal chats",
       list: { title: "Messages", data: personalChats },
       RenderList: RenderChatList,
-      NoData: NoData({ currentPanel: "personal-chat" }),
+      NoData,
     },
     "group-chat": {
       "aria-label": "Group Panel",
       title: "Group chats",
       list: { title: "Groups", data: groupChats },
       RenderList: RenderChatList,
-      NoData: NoData({ currentPanel: "group-chat" }),
+      NoData,
     },
     calls: {
       "aria-label": "Call Panel",
       title: "Calls",
       list: { title: "History" },
-      NoData: NoData({ currentPanel: "calls" }),
+      NoData,
     },
   };
 
@@ -55,6 +57,12 @@ export function Display1() {
       loading: isLoading,
       onSearch: handleSearch,
     },
+    "new-group": {
+      type: currentFloatingPanel,
+      className: "floating-panel new-group",
+      "aria-label": "Create New Group Panel",
+      title: "Create Group",
+    },
     settings: {
       title: "settings",
       "aria-label": "Settings Panel",
@@ -67,20 +75,21 @@ export function Display1() {
   };
 
   const props = {
-    ...panelProps[panel.current],
+    ...panelProps[currentPanel],
     onSearch: handleSearch,
   };
 
   const floatingPanelComponent = {
     profile: <Profile />,
     "new-chat": <ListPanel {...floatingPanelProps["new-chat"]} />,
+    "new-group": <NewGroup {...floatingPanelProps["new-group"]} />,
     settings: <Settings {...floatingPanelProps["settings"]} />,
     appearance: <Settings {...floatingPanelProps["appearance"]} />,
   };
 
   return (
     <div className="display-1" inert={isChatOpen}>
-      <ListPanel type={panel.current} inert={isFloatingPanelOpen} {...props} />
+      <ListPanel type={currentPanel} inert={isFloatingPanelOpen} {...props} />
 
       {currentFloatingPanel && floatingPanelComponent[currentFloatingPanel]}
 
@@ -109,8 +118,9 @@ export function Display2() {
   );
 }
 
-function NoData({ currentPanel }) {
-  const { floatingPanel } = useUI();
+function NoData() {
+  const { panel, floatingPanel } = useUI();
+  const currentPanel = panel.current;
 
   const handleNavigate = (path) => () => {
     floatingPanel.navigate(path);
@@ -129,6 +139,7 @@ function NoData({ currentPanel }) {
       description:
         "You are not a member of any groups yet. Join or create groups to start group chatting.",
       label: "Create Group",
+      onClick: handleNavigate("new-group"),
     },
     calls: {
       title: "Call Feature",

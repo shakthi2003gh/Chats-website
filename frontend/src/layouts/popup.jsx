@@ -6,6 +6,9 @@ import { RiErrorWarningLine } from "react-icons/ri";
 import { formatTime } from "../utilities";
 import { Input } from "../components/inputGroup";
 import Button from "../components/button";
+import RenderPeopleList from "../components/renderPeopleList";
+import { PublicHTTP } from "../services/http/public";
+import { IoMdRefresh } from "react-icons/io";
 
 const PopupContext = createContext(null);
 
@@ -14,53 +17,57 @@ export function usePopup() {
 }
 
 export default function PopupProvider({ children }) {
-  const initialEvent = { handleCancel: undefined, onConfirm: undefined };
+  const initialEvent = { handleClose: undefined, onConfirm: undefined };
 
   const [show, setShow] = useState(false);
   const [type, setType] = useState("confirmation");
   const [data, setData] = useState(null);
   const [event, setEvent] = useState(initialEvent);
 
-  const handleCancel = () => {
+  const handleClose = () => {
     setShow(false);
     setData(null);
     setEvent(initialEvent);
   };
 
-  const handleClose = (e) => {
-    if (["device", "edit"].includes(type) && e.type === "click") return;
-    if (e.code === "Escape" || e.type === "click") handleCancel();
+  const handleCancel = (e) => {
+    const nonAutoExitable = ["device", "edit", "addMember"];
+    if (nonAutoExitable.includes(type) && e.type === "click") return;
+
+    if (e.code === "Escape" || e.type === "click") handleClose();
   };
 
   const display = ({ type, data, onConfirm }) => {
     setShow(true);
     setType(type);
     setData(data);
-    setEvent({ onConfirm, handleCancel });
+    setEvent({ onConfirm, handleClose });
   };
 
   useEffect(() => {
-    window.addEventListener("keyup", handleClose);
+    window.addEventListener("keyup", handleCancel);
 
-    return () => window.removeEventListener("keyup", handleClose);
+    return () => window.removeEventListener("keyup", handleCancel);
   }, [type]);
 
-  const props = { data, event };
-
   const containers = {
-    confirmation: ConfirmationContainer(props),
-    edit: EditContainer(props),
-    device: DeviceLoginContainer(props),
-    logout: logoutContainer(props),
+    confirmation: ConfirmationContainer,
+    edit: EditContainer,
+    device: DeviceLoginContainer,
+    logout: LogoutContainer,
+    addMember: AddMemberContainer,
   };
+
+  const Container = containers[type];
+  const props = { data, event };
 
   return (
     <PopupContext.Provider value={{ display, isShowPopup: show }}>
       {children}
 
       {show && (
-        <div className="popup" onClick={handleClose}>
-          {containers[type]}
+        <div className="popup" onClick={handleCancel}>
+          <Container {...props} />
         </div>
       )}
     </PopupContext.Provider>
@@ -70,12 +77,12 @@ export default function PopupProvider({ children }) {
 function ConfirmationContainer(props) {
   const { data, event } = props || {};
   const { heading, description } = data || {};
-  const { handleCancel, onConfirm } = event || {};
+  const { handleClose, onConfirm } = event || {};
 
   const className = "confirmation container";
 
   const handleConfirm = () => {
-    handleCancel?.();
+    handleClose?.();
     onConfirm?.();
   };
 
@@ -86,7 +93,7 @@ function ConfirmationContainer(props) {
       <p>{description || "Are you sure want to do this?"}</p>
 
       <div className="buttons">
-        <Button onClick={handleCancel}>cancel</Button>
+        <Button onClick={handleClose}>cancel</Button>
 
         <Button color="danger" onClick={handleConfirm}>
           confirm
@@ -96,14 +103,14 @@ function ConfirmationContainer(props) {
   );
 }
 
-function logoutContainer(props) {
+function LogoutContainer(props) {
   const { event } = props || {};
-  const { handleCancel } = event || {};
+  const { handleClose } = event || {};
 
   const className = "logout container";
 
   const handleConfirm = () => {
-    handleCancel?.();
+    handleClose?.();
   };
 
   return (
@@ -125,12 +132,12 @@ function logoutContainer(props) {
 function DeviceLoginContainer(props) {
   const { data, event } = props || {};
   const { label, lastUsed, message } = data || {};
-  const { handleCancel, onConfirm } = event || {};
+  const { handleClose, onConfirm } = event || {};
 
   const className = "device-auth container";
 
   const handleConfirm = () => {
-    handleCancel?.();
+    handleClose?.();
     onConfirm?.();
   };
 
@@ -174,7 +181,7 @@ function DeviceLoginContainer(props) {
       </p>
 
       <div className="buttons">
-        <Button onClick={handleCancel}>Stay logout</Button>
+        <Button onClick={handleClose}>Stay logout</Button>
 
         <Button color="danger" onClick={handleConfirm}>
           Log in
@@ -187,7 +194,7 @@ function DeviceLoginContainer(props) {
 function EditContainer(props) {
   const { data, event } = props || {};
   const { heading, value: defaultValue, method = "input" } = data || {};
-  const { handleCancel, onConfirm } = event || {};
+  const { handleClose, onConfirm } = event || {};
 
   const [isLoading, setLoading] = useState(false);
   const [value, setValue] = useState(defaultValue || "");
@@ -200,7 +207,7 @@ function EditContainer(props) {
   const handleConfirm = () => {
     setLoading(true);
     onConfirm?.(value)
-      .then(handleCancel)
+      .then(handleClose)
       .finally(() => setLoading(false));
   };
 
@@ -230,7 +237,7 @@ function EditContainer(props) {
       />
 
       <div className="buttons">
-        <Button type="button" onClick={handleCancel}>
+        <Button type="button" onClick={handleClose}>
           cancel
         </Button>
 
@@ -244,5 +251,100 @@ function EditContainer(props) {
         </Button>
       </div>
     </form>
+  );
+}
+
+function AddMemberContainer(props) {
+  const { data, event } = props || {};
+
+  const { members = [] } = data || {};
+  const { handleClose, onConfirm } = event || {};
+
+  const [search, setSearch] = useState("");
+  const [people, setPeople] = useState([]);
+  const [selected, setSelect] = useState([]);
+  const [isLoading, setLoading] = useState(false);
+  const className = "add-member container";
+  const totalCount = 30;
+  const membersCount = members?.length || 0;
+  const selectedCount = selected?.length || 0;
+  const maxCount = totalCount - membersCount;
+  const isDisabled = !selectedCount || selectedCount > maxCount;
+
+  const handleGetPeople = () => {
+    setLoading(true);
+
+    PublicHTTP.getPeople()
+      .then(setPeople)
+      .finally(() => setLoading(false));
+  };
+
+  const handleFilterExist = ({ _id: user_id }) => {
+    return !members.some(({ _id }) => _id === user_id);
+  };
+
+  const handleSearchFilter = (data) => {
+    if (!search) return true;
+
+    return data.name.match(new RegExp(search, "gi"));
+  };
+
+  const handleSelect = (user) => {
+    setSelect((prev) => {
+      if (prev.some(({ _id }) => _id === user?._id))
+        return prev.filter(({ _id }) => _id !== user?._id);
+
+      if (members.length < 30) return [...prev, user];
+      return prev;
+    });
+  };
+
+  const handleConfirm = () => {
+    onConfirm(selected);
+    handleClose();
+  };
+
+  useEffect(handleGetPeople, []);
+
+  const filteredList = people
+    .filter(handleFilterExist)
+    .filter(handleSearchFilter);
+
+  return (
+    <div className={className}>
+      <h3>Add Members ({membersCount}/30)</h3>
+
+      <Input placeholder="search..." onChange={setSearch} />
+
+      <div className="people">
+        <div className="header">
+          <h4>People</h4>
+
+          <button
+            title="Refresh"
+            className="btn no-btn refresh"
+            onClick={handleGetPeople}
+            disabled={isLoading}
+          >
+            <IoMdRefresh />
+          </button>
+        </div>
+
+        <RenderPeopleList
+          list={filteredList}
+          selectedList={selected}
+          loading={isLoading}
+          onSelect={handleSelect}
+        />
+      </div>
+
+      <div className="buttons">
+        <Button onClick={handleClose}>cancel</Button>
+
+        <Button color="danger" onClick={handleConfirm} disabled={isDisabled}>
+          Add ({selectedCount}/{totalCount - membersCount})
+        </Button>
+      </div>
+    </div>
   );
 }

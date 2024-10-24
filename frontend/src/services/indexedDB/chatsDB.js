@@ -6,22 +6,17 @@ class ChatsLocalDB {
     this.db.config.debug = false;
   }
 
-  getChats() {
-    const collectionName = "personalChats";
-
+  getChats(collectionName = "personalChats") {
     return this.db.collection(collectionName).get();
   }
 
-  addChat(chat) {
-    const collectionName = "personalChats";
-
+  addChat(chat, collectionName = "personalChats") {
     return this.db.collection(collectionName).add(chat, chat._id);
   }
 
-  async addChats(chats) {
+  async addChats(chats, collectionName = "personalChats") {
     if (!chats) return;
 
-    const collectionName = "personalChats";
     await this.removeChats();
 
     return chats.forEach((chat) => {
@@ -29,7 +24,7 @@ class ChatsLocalDB {
     });
   }
 
-  addMessage(chat_id, messages, lastMessage) {
+  addMessage(chat_id, messages, lastMessage, collectionName = "personalChats") {
     const user_id = sessionStorage.getItem("user_id");
     let unreadCount = 0;
     messages.forEach(({ readReceipt, author }) => {
@@ -37,15 +32,15 @@ class ChatsLocalDB {
     });
 
     this.db
-      .collection("personalChats")
+      .collection(collectionName)
       .doc({ _id: chat_id })
       .update({ messages, unreadCount, lastMessage });
   }
 
-  removeChats() {
-    return this.getChats().then((chat) => {
+  removeChats(collectionName = "personalChats") {
+    return this.getChats(collectionName).then((chat) => {
       if (!chat?.length) return;
-      return this.db.collection("personalChats").doc({}).delete();
+      return this.db.collection(collectionName).doc({}).delete();
     });
   }
 }

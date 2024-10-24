@@ -1,0 +1,11 @@
+.person {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem;
+  border-radius: 5px;
+
+  button {
+    margin-left: auto;
+  }
+}

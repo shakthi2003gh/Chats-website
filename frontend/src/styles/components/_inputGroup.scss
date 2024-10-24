@@ -30,7 +30,7 @@
     left: 1em;
     text-transform: capitalize;
     transform: translateY(-50%);
-    transition: all var(--duration) ease-in-out;
+    transition: all var(--duration) ease-in-out, visibility 0s;
 
     &.hidden {
       top: -35%;
@@ -38,9 +38,14 @@
       visibility: hidden;
       z-index: -1;
     }
+
+    &:has(+ textarea) {
+      top: 1.45em;
+    }
   }
 
-  input {
+  input,
+  textarea {
     padding: 0.55em 1em;
     width: 100%;
     border: none;
@@ -48,6 +53,11 @@
     caret-color: var(--clr-primary);
     border-radius: inherit;
     outline: none;
+  }
+
+  textarea {
+    min-height: 6rem;
+    resize: none;
   }
 
   button:has(svg.eye) {
@@ -112,6 +122,10 @@
       transform: translateY(0);
       visibility: visible;
       z-index: 0;
+    }
+
+    &:has(textarea) label {
+      top: -13.5%;
     }
 
     .eye {
