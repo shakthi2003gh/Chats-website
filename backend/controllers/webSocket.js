@@ -1,6 +1,7 @@
 const url = require("url");
 const WebSocket = require("ws");
 const { User } = require("../models/user");
+const { Group } = require("../models/group");
 const { authToken } = require("../middleware/auth");
 const { storeMessage } = require("../helper/chat");
 const { updateReadReceipt } = require("../helper/message");
@@ -24,6 +25,7 @@ module.exports = class {
 
     const handlePong = this.onPong;
     const handleMessage = this.onMessage;
+    const handleCreateGroup = this.onCreateGroup;
     const handleMessageReceipt = this.onUpdateReceiptStatus;
 
     return async function (request) {
@@ -34,6 +36,7 @@ module.exports = class {
 
         if (type === "pong") handlePong(ws);
         if (type === "message") handleMessage(server, ws)(data);
+        if (type === "create-group") handleCreateGroup(server, ws)(data);
         if (type === "messageStatus") handleMessageReceipt(server, ws)(data);
       } catch {
         const message =
@@ -126,6 +129,48 @@ module.exports = class {
           const type = isNewChat ? "new-chat" : "message";
 
           send(client, { type, data });
+        }
+      });
+    };
+  }
+
+  onCreateGroup(server, ws) {
+    return async function (payload) {
+      const { error, value } = validate.createGroup(payload);
+      if (error) {
+        const response = { type: "error", data: error.details[0] };
+        return send(ws, response);
+      }
+
+      const group = new Group({ ...value, createdBy: ws._id });
+      await group.save();
+
+      await User.updateMany(
+        { _id: { $in: group.members } },
+        { $addToSet: { groupChats: group._id } }
+      );
+
+      const populate = [
+        {
+          path: "members",
+          select: "_id name image device.isOnline",
+        },
+        {
+          path: "admin",
+          select: "_id name image",
+        },
+      ];
+      const newGroup = await Group.findById(group._id).populate(populate);
+
+      server.clients.forEach((client) => {
+        const isSelf = ws === client;
+        const members = newGroup.members;
+        const isReceiver = members.find(({ id }) => id === client._id);
+        const isOnline = client.readyState === WebSocket.OPEN;
+
+        if ((isSelf || isReceiver) && isOnline) {
+          const type = "new-group";
+          send(client, { type, data: newGroup });
         }
       });
     };
