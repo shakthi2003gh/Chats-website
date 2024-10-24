@@ -1,7 +1,7 @@
 const url = require("url");
 const jwt = require("jsonwebtoken");
 const { User } = require("../models/user");
-const { UserResponse } = require("../response/user");
+const Response = require("../response");
 
 const TOKEN_NAME = process.env.TOKEN_NAME;
 
@@ -25,12 +25,12 @@ exports.auth = async function (req, res, next) {
     const token = req.header(TOKEN_NAME);
 
     const { error, user, data } = await authToken(token);
-    if (error) return UserResponse[error](res, data);
+    if (error) return Response[error](res, data);
 
     req.user = user;
     next();
   } catch (error) {
-    res.status(401).send({ message: "Invalid token.", error });
+    Response.serverError(res);
   }
 };
 
