@@ -2,7 +2,8 @@ const _ = require("lodash");
 const jwt = require("jsonwebtoken");
 const UAParser = require("ua-parser-js");
 const { Message } = require("./message");
-const { getChats } = require("../helper/chat");
+const { getChats, getGroupChats } = require("../helper/chat");
+const { transformMessage } = require("../helper/message.js");
 const { getRandomNumbers } = require("../common/index.js");
 const { emailOTP } = require("../services/email");
 
@@ -74,7 +75,7 @@ exports.generateAuthToken = async function () {
   return jwt.sign(payload, process.env.JWT_KEY);
 };
 
-exports.addMessage = async function (data) {
+exports.addMessage = async function ({ user_id, ...data }) {
   const message = new Message({ chat: this.id, ...data });
   this.messages.push(message._id);
 
@@ -82,10 +83,12 @@ exports.addMessage = async function (data) {
   await this.save();
 
   const populate = { path: "author", select: "_id image name" };
-
-  return Message.findById(message._id)
+  const newMessage = await Message.findById(message._id)
     .populate(populate)
-    .select("_id text image author readReceipt createdAt");
+    .select("_id text image author readReceipt createdAt")
+    .lean();
+
+  return transformMessage(user_id)(newMessage);
 };
 
 exports.createOne = async function (data) {
@@ -108,8 +111,9 @@ exports.getLoginData = async function () {
   const pick = ["_id", "name", "email", "image", "about"];
   const user = _.pick(this, pick);
   const personal = await getChats(this.personalChats, this._id);
+  const group = await getGroupChats(this.groupChats, this._id);
 
-  const chat = { personal, group: {} };
+  const chat = { personal, group };
   return { user, chat };
 };
 
@@ -126,4 +130,13 @@ exports.addDevice = async function (userAgent) {
   await this.save();
 
   return this.device._id;
+};
+
+exports.getMembersCount = async function (chat_id) {
+  if (!chat_id) return null;
+
+  const chat = await this.findById(chat_id);
+  if (!chat) return null;
+
+  return chat?.members?.length - 1 || 0;
 };

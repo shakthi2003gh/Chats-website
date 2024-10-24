@@ -36,6 +36,13 @@ const schema = new mongoose.Schema(
         required: true,
       },
     ],
+    groupChats: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "GroupChat",
+        required: true,
+      },
+    ],
     device: {
       type: deviceSchema,
       default: null,

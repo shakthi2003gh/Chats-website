@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { addMessage, createOne } = require("./utilities");
+const { addMessage, createOne, getMembersCount } = require("./utilities");
 
 const schema = new mongoose.Schema(
   {
@@ -20,6 +20,6 @@ const schema = new mongoose.Schema(
 );
 
 schema.methods = { addMessage };
-schema.statics = { createOne };
+schema.statics = { createOne, getMembersCount };
 
 exports.Chat = mongoose.model("Chat", schema);
