@@ -24,7 +24,7 @@ export default function UserProvider({ children }) {
   const [isLoading, setLoading] = useState(true);
 
   const { isConnected } = wsRef;
-  const { setPersonalChats } = chats || {};
+  const { setPersonalChats, setGroupChats } = chats || {};
   const needAuthentication = isOnline && isConnected && !!user;
 
   const setuser = (user) => {
@@ -54,6 +54,7 @@ export default function UserProvider({ children }) {
       .then(({ user, chat }) => {
         setuser(user);
         setPersonalChats(chat.personal, true);
+        setGroupChats(chat.group, true);
       })
       .catch((data) => {
         if (typeof data === "string" && data === networkErrorMsg) return;
@@ -76,6 +77,7 @@ export default function UserProvider({ children }) {
       .then(({ user, chat }) => {
         setuser(user);
         setPersonalChats(chat.personal);
+        setGroupChats(chat.group);
       })
       .catch((data) => {
         if (typeof data !== "object") return;
@@ -97,7 +99,7 @@ export default function UserProvider({ children }) {
           DataReset();
           setUser(null);
           userLocalDB.removeUser();
-          chatsLocalDB.removeChats();
+          chatsLocalDB.removeAllChats();
           sessionStorage.removeItem("user_id");
         });
     };

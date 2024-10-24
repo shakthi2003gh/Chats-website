@@ -69,3 +69,11 @@
     background-color: var(--hover);
   }
 }
+
+@mixin countBadge {
+  font-size: 0.75rem;
+  padding: 1px 10px;
+  color: var(--clr-light-700);
+  background-color: var(--clr-primary);
+  border-radius: 50px;
+}

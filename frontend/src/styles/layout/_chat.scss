@@ -3,6 +3,7 @@ section.chat {
   flex-direction: column;
   container-type: inline-size;
   width: 100%;
+  min-height: 250px;
   height: var(--height, 100%);
   background-color: var(--clr-gray);
   overflow: hidden;
@@ -20,7 +21,6 @@ section.chat {
       font-size: 1.4rem;
       padding: 1rem;
       border-radius: 0;
-      // outline: none;
 
       &:focus-visible {
         background-color: var(--hover);

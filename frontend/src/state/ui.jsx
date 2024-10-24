@@ -2,6 +2,16 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { navigate as urlNavigation } from "../utilities";
 import useMediaQuery from "../hooks/useMediaQuery";
 
+const colors = ["pink", "green", "yellow", "blue"];
+const panels = ["personal-chat", "group-chat", "calls"];
+const floatingPanels = [
+  "profile",
+  "new-chat",
+  "new-group",
+  "settings",
+  "appearance",
+];
+
 const getSystemTheme = () =>
   window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 
@@ -18,10 +28,6 @@ export function useUI() {
 }
 
 export default function UIProvider({ children }) {
-  const colors = ["pink", "green", "yellow", "blue"];
-  const panels = ["personal-chat", "group-chat", "calls"];
-  const floatingPanels = ["profile", "new-chat", "settings", "appearance"];
-
   const [isDark, setDark] = useState(InitialTheme === "dark");
   const [currentColor, setCurrentColor] = useState(InitialColor || colors[0]);
   const [currentPanel, setCurrentPanel] = useState(panels[0]);
@@ -63,10 +69,12 @@ export default function UIProvider({ children }) {
     const chat_id = path.split("/")[2];
     const floatingPanel = url.searchParams.get("show");
     const showContact = chat_id && !!url.searchParams.get("contact-info");
+    const id = panel === "new-chat" ? "user_id" : "_id";
+    const type = panel;
 
-    navigate(panel || "personal-chat");
+    navigate(panel || panels[0]);
     setCurrentFloatingPanel(floatingPanel);
-    setCurrentChat(chat_id ? { _id: chat_id, showContact } : null);
+    setCurrentChat(chat_id ? { [id]: chat_id, showContact, type } : null);
   };
 
   const themeToggle = () => {
@@ -96,7 +104,7 @@ export default function UIProvider({ children }) {
       if (show) url.searchParams.set("contact-info", show);
       else url.searchParams.delete("contact-info");
 
-      urlNavigation(url.pathname + url.search);
+      urlNavigation(url.pathname + url.search, isSmallDevice);
       return { ...prev, showContact: show };
     });
   };

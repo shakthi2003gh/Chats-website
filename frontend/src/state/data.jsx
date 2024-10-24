@@ -25,19 +25,20 @@ export default function DataProvider({ children }) {
   const { current: currentFloatingPanel } = floatingPanel;
   const statusOptions = ["delivered", "seen"];
 
-  const sendMessageStatus = ({ message_id, status }) => {
+  const sendMessageStatus = ({ chatType, message_id, status }) => {
     const socket = wsRef.current;
     const isConnected = wsRef.isConnected;
 
     if (!isConnected) return;
     if (!statusOptions.includes(status)) return;
 
-    const data = { message_id, status };
+    const data = { chatType, message_id, status };
     const payload = { type: "messageStatus", data };
+
     socket.send(JSON.stringify(payload));
   };
 
-  const checkReadRecipt = (chat) => {
+  const checkReadRecipt = (chatType) => (chat) => {
     const user_id = sessionStorage.getItem("user_id");
 
     chat.unreadCount = 0;
@@ -56,7 +57,7 @@ export default function DataProvider({ children }) {
       if (chat.lastMessage._id === message._id)
         chat.lastMessage.readReceipt = status;
 
-      sendMessageStatus({ message_id, status });
+      sendMessageStatus({ chatType, message_id, status });
       return message;
     });
 
@@ -134,12 +135,13 @@ export default function DataProvider({ children }) {
   };
 
   const getChat = () => {
-    const { _id: id, user_id } = chat.current;
+    const { _id: id, user_id, type } = chat.current;
 
     const findUser = ({ _id }) => _id === user_id;
     const findChat = ({ _id, user_id }) => id === _id || id === user_id;
     const newChat = () => ({ ...people.find(findUser), isNew: true });
 
+    if (type === "group-chat") return groupChats.find(findChat);
     return personalChats.find(findChat) || newChat();
   };
 
@@ -162,6 +164,7 @@ export default function DataProvider({ children }) {
   };
 
   const addNewChat = (data) => {
+    const personalChat = "personal-chat";
     const { _id: chat_id, user_id } = data;
     const url = window.location.pathname;
     const panelName = url.split("/")[1];
@@ -182,8 +185,11 @@ export default function DataProvider({ children }) {
     setGroupChats((prev) => [...prev, data]);
   };
 
-  const addMessage = ({ temp_id, chat_id, message }, type) => {
-    setChats((prev) =>
+  const addMessage = (data, type) => {
+    const { chatType = "personal-chat", temp_id, chat_id, message } = data;
+    const { setter, collectionName } = getChatProps(chatType);
+
+    setter((prev) =>
       prev.map((chat) => {
         if (chat._id !== chat_id) return chat;
 
@@ -200,7 +206,7 @@ export default function DataProvider({ children }) {
             const status = statusOptions[0];
 
             message.readReceipt = status;
-            sendMessageStatus({ message_id: _id, status });
+            sendMessageStatus({ chatType, message_id: _id, status });
 
             if (message.readReceipt !== statusOptions[1])
               chat.unreadCount = chat?.unreadCount ? chat?.unreadCount + 1 : 1;
@@ -213,15 +219,22 @@ export default function DataProvider({ children }) {
 
         chat.messages = type === "echo" ? update() : add();
         chat.lastMessage = message;
-        chatsLocalDB.addMessage(chat_id, chat.messages, message);
+        chatsLocalDB.addMessage(
+          chat_id,
+          chat.messages,
+          message,
+          collectionName
+        );
 
         return chat;
       })
     );
   };
 
-  const removeMessage = ({ chat_id, message_id }) => {
-    setChats((prev) =>
+  const removeMessage = ({ chatType, chat_id, message_id }) => {
+    const { setter, collectionName } = getChatProps(chatType);
+
+    setter((prev) =>
       prev.map((chat) => {
         if (chat._id !== chat_id) return chat;
 
@@ -235,48 +248,58 @@ export default function DataProvider({ children }) {
           chat.lastMessage = lastMessage;
         }
 
-        chatsLocalDB.addMessage(chat_id, chat.messages, chat.lastMessage);
+        chatsLocalDB.addMessage(
+          chat_id,
+          chat.messages,
+          chat.lastMessage,
+          collectionName
+        );
 
         return chat;
       })
     );
   };
 
-  const sendMessage = ({ chat_id, receiver_id, text, image, author }) => {
-    const _id = new Date(Date.now()).toISOString();
-    const isConnected = socket && socket.readyState === socket.OPEN;
+  const sendMessage =
+    (chatType = "personal-chat") =>
+    ({ chat_id, receiver_id, text, image, author }) => {
+      const _id = new Date(Date.now()).toISOString();
+      const isConnected = socket && socket.readyState === socket.OPEN;
 
-    if (!((chat_id || receiver_id) && (text || image))) return;
+      if (!((chat_id || receiver_id) && (text || image))) return;
 
-    const send = (image) => {
-      const message = { temp_id: _id, chat_id, receiver_id, text, image };
-      const payload = { type: "message", data: message };
+      const send = (image) => {
+        const message = { temp_id: _id, chat_id, receiver_id, text, image };
+        const payload = { type: "message", data: { chatType, message } };
 
-      if (isConnected) socket.send(JSON.stringify(payload));
+        if (isConnected) socket.send(JSON.stringify(payload));
+      };
+
+      if (image)
+        uploadMessageImage(chat_id, image.file)
+          .then(send)
+          .catch(() => {});
+      else send();
+
+      if (!(text?.length <= 1000 || image)) return;
+      const localMessage = { _id, text, image, createdAt: _id, author };
+      addMessage({ chatType, chat_id, message: localMessage });
     };
 
-    if (image)
-      uploadMessageImage(chat_id, image.file)
-        .then(send)
-        .catch(() => {});
-    else send();
+  const resendMessage =
+    (chatType = "personal-chat") =>
+    ({ temp_id, text, image, author }) => {
+      const chat_id = chat.current._id;
 
-    if (!(text?.length <= 1000 || image)) return;
-    const localMessage = { _id, text, image, createdAt: _id, author };
-    addMessage({ chat_id, message: localMessage });
-  };
-
-  const resendMessage = ({ temp_id, text, image, author }) => {
-    const chat_id = chat.current._id;
-
-    sendMessage({ chat_id, text, image, author });
-    removeMessage({ chat_id, message_id: temp_id });
-  };
+      sendMessage(chatType)({ chat_id, text, image, author });
+      removeMessage({ chatType, chat_id, message_id: temp_id });
+    };
 
   const updateMessageStatus = (data, makeResponse = false) => {
-    const { chat_id, message_id, status, user_id } = data;
+    const { chatType, chat_id, message_id, status, user_id } = data;
+    const { setter, collectionName } = getChatProps(chatType);
 
-    setChats((prev) =>
+    setter((prev) =>
       prev.map((chat) => {
         if (chat._id !== chat_id) return chat;
 
@@ -297,12 +320,17 @@ export default function DataProvider({ children }) {
           return message;
         });
 
-        chatsLocalDB.addMessage(chat_id, chat.messages, chat.lastMessage);
+        chatsLocalDB.addMessage(
+          chat_id,
+          chat.messages,
+          chat.lastMessage,
+          collectionName
+        );
         return chat;
       })
     );
 
-    if (makeResponse) sendMessageStatus({ message_id, status });
+    if (makeResponse) sendMessageStatus({ chatType, message_id, status });
   };
 
   const updateUserOnlineStatus = ({ chat_id, user_id, status }) => {
@@ -333,6 +361,7 @@ export default function DataProvider({ children }) {
       ping: handleHeartBeat,
       error: handleError,
       "new-chat": addNewChat,
+      "new-group": addNewGroup,
       message: addMessage,
       echo: addMessage,
       messageStatus: updateMessageStatus,
@@ -362,6 +391,7 @@ export default function DataProvider({ children }) {
 
   useEffect(() => {
     chatsLocalDB.getChats().then(setChats);
+    chatsLocalDB.getChats("groupChats").then(setGroups);
   }, []);
 
   const m = { handleReceiveMessage, reset: handleReset, updateMessageStatus };

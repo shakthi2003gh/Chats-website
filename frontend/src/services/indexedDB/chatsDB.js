@@ -17,7 +17,7 @@ class ChatsLocalDB {
   async addChats(chats, collectionName = "personalChats") {
     if (!chats) return;
 
-    await this.removeChats();
+    await this.removeChats(collectionName);
 
     return chats.forEach((chat) => {
       this.db.collection(collectionName).add(chat, chat._id);
@@ -41,6 +41,21 @@ class ChatsLocalDB {
     return this.getChats(collectionName).then((chat) => {
       if (!chat?.length) return;
       return this.db.collection(collectionName).doc({}).delete();
+    });
+  }
+
+  removeAllChats() {
+    let taskCompleteCount = 0;
+
+    return new Promise((resolve, reject) => {
+      const handleDone = () => {
+        taskCompleteCount++;
+
+        if (taskCompleteCount === 2) resolve();
+      };
+
+      this.removeChats("personalChats").catch(reject).finally(handleDone);
+      this.removeChats("groupChats").catch(reject).finally(handleDone);
     });
   }
 }

@@ -13,10 +13,11 @@ export default function UserLink(props) {
     "chat-link": true,
     active: chat.current?.user_id === _id,
   };
+  const url = new URL(window.location.href);
   const classNames = classes(classObj, className);
 
   const handleClick = () => {
-    chat.setCurrent({ user_id: _id });
+    chat.setCurrent({ user_id: _id, type: "personal-chat" });
   };
 
   return (
@@ -24,7 +25,7 @@ export default function UserLink(props) {
       aria-label={name + " chat"}
       className={classNames}
       onClick={handleClick}
-      to={`/new-chat/` + _id}
+      to={`/new-chat/` + _id + url.search}
       {...rest}
     >
       <ProfileImage image={image} placeholder={name} isOnline={isOnline} />

@@ -8,7 +8,8 @@ import ReadReceipt from "./readReceipt";
 export default function ChatLink(props) {
   const { _id, image, name, messages, className, lastMessage, ...r } = props;
   const { user_id, email, unreadCount, isOnline, about, ...re } = r;
-  const { type = "chat", createdAt, updatedAt, ...rest } = re;
+  const { type = "chat", createdAt, updatedAt, createdBy, ...res } = re;
+  const { admin, members, ...rest } = res;
 
   const { chat } = useUI();
   const { user } = useUser();
@@ -27,7 +28,7 @@ export default function ChatLink(props) {
   const handleClick = () => {
     if (chat.current?._id === _id) return;
 
-    chat.setCurrent({ _id });
+    chat.setCurrent({ _id, type });
     chat.toggleShowContact(false);
   };
 
@@ -35,9 +36,10 @@ export default function ChatLink(props) {
     "chat-link": true,
     active: chat.current?._id === _id,
   };
+  const url = new URL(window.location.href);
   const classNames = classes(classObj, className);
   const { lastText, sendAt, author } = getLastMessage();
-  const formatedTimeStamp = formatTime(sendAt);
+  const formatedTimeStamp = formatTime(sendAt || createdAt);
   const isOwnMessage = user._id === author?._id;
 
   return (
@@ -45,7 +47,7 @@ export default function ChatLink(props) {
       aria-label={name + " chat"}
       className={classNames}
       onClick={handleClick}
-      to={`/${type}/` + _id}
+      to={`/${type}/` + _id + url.search}
       {...rest}
       tabIndex={classObj.active ? -1 : 0}
     >

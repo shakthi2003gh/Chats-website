@@ -8,8 +8,8 @@ function RenderList(Link) {
     const listRef = useRef();
     const listLength = list.length;
 
-    const getNodeList = () => listRef.current?.querySelectorAll("li.chat");
-    useObserver(getNodeList, null, [listLength]);
+    const getNodeList = () => listRef.current?.querySelectorAll("li");
+    useObserver(getNodeList, null, [list]);
 
     if (loading) return <p className="not-found">Loading...</p>;
 

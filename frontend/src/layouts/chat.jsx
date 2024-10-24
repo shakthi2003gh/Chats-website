@@ -23,6 +23,7 @@ export default function Chat({ ...rest }) {
   const { isSmall } = mediaQuery;
   const { _id, image, name, unreadCount, ...restChat } = getChat();
   const { messages = [], isOnline: isUserOnline, isNew = false } = restChat;
+  const currentChatType = chat?.current?.type || "personal-chat";
 
   const handleResize = () => {
     const displayHeight = window.visualViewport.height + "px";
@@ -37,9 +38,10 @@ export default function Chat({ ...rest }) {
   };
 
   const scrollToBottom = () => {
-    const { scrollHeight, clientHeight } = chatRef.current;
+    const { scrollHeight, clientHeight } = chatRef.current || {};
 
-    chatRef.current.scrollTop = scrollHeight - clientHeight;
+    if (chatRef.current)
+      chatRef.current.scrollTop = scrollHeight - clientHeight;
     if (showScrollBtn) setShowScrollBtn(false);
   };
 
@@ -49,7 +51,7 @@ export default function Chat({ ...rest }) {
 
   const handleClose = () => {
     chat.setCurrent(null);
-    panel.navigate("personal-chat", true);
+    panel.navigate(currentChatType, true);
   };
 
   const handleGroupUp = (group, message) => {
@@ -68,6 +70,8 @@ export default function Chat({ ...rest }) {
   const composeProps = {
     [isNew ? "receiver_id" : "chat_id"]: _id,
     scrollToBottom,
+    canUploadImage: !isNew,
+    chatType: currentChatType,
   };
   const menuOptions = [
     <button onClick={handleOpenContact}>contact info</button>,
@@ -96,6 +100,7 @@ export default function Chat({ ...rest }) {
 
     const data = {
       chat_id: _id,
+      chatType: currentChatType,
       message_id: node.id,
       status: "seen",
       user_id: sessionStorage.getItem("user_id"),
@@ -104,7 +109,10 @@ export default function Chat({ ...rest }) {
   };
   useObserver(getNodeList, callback, [isOnline, messagesLength]);
 
-  if (!_id) return null;
+  if (!_id) {
+    chat.setCurrent(null);
+    return null;
+  }
 
   return (
     <section
@@ -150,7 +158,11 @@ export default function Chat({ ...rest }) {
               {groupedMessages[date]
                 .sort((a, b) => (a.createdAt <= b.createdAt ? -1 : 1))
                 .map((message) => (
-                  <Message key={message._id} {...message} />
+                  <Message
+                    key={message._id}
+                    currentChatType={currentChatType}
+                    {...message}
+                  />
                 ))}
             </div>
           </div>

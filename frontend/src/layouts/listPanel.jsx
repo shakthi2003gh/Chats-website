@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { IoIosArrowDown } from "react-icons/io";
 import { useUI } from "../state/ui";
 import { classes } from "../utilities";
 import { MobileHeader, PanelHeader } from "../components/headers";
 import { Input } from "../components/inputGroup";
 import RenderOnlineUsers from "../components/renderOnlineUsers";
+import DropDown from "../components/dropDown";
 
 export default function ListPanel(props) {
   const { title, list, onSearch, className, loading, ...r } = props;
@@ -22,7 +22,7 @@ export default function ListPanel(props) {
       <section className={classNames} {...rest}>
         {mediaQuery.isSmaller && <MobileHeader />}
 
-        {NoData}
+        <NoData />
       </section>
     );
 
@@ -33,9 +33,14 @@ export default function ListPanel(props) {
     return onSearch(data, search);
   };
 
-  const handleSort = ({ lastMessage: a }, { lastMessage: b }) => {
+  const handleSort = (chatA, chatB) => {
     if (!isChatPanel) return 0;
-    return new Date(b.createdAt) - new Date(a.createdAt);
+
+    const dateA = chatA.lastMessage?.createdAt || chatA.createdAt;
+    const dateB = chatB.lastMessage?.createdAt || chatB.createdAt;
+
+    if (!dateA || !dateB) return 0;
+    return new Date(dateB) - new Date(dateA);
   };
 
   const getOnlineUsers = (data) => {
@@ -61,17 +66,9 @@ export default function ListPanel(props) {
 
       <div className="scroll-section">
         {type === chatPanels[0] && !!onlineUsers.length && (
-          <details className="list">
-            <summary className="sub-heading">
-              <h2>Online</h2>
-
-              <span className="unread-count">{onlineUsers.length}</span>
-
-              <IoIosArrowDown />
-            </summary>
-
+          <DropDown title="Online" count={onlineUsers.length}>
             <RenderOnlineUsers data={onlineUsers} />
-          </details>
+          </DropDown>
         )}
 
         <section className="list">

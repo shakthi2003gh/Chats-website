@@ -17,6 +17,8 @@ export default function Settings(props) {
   const { user, logout } = useUser();
   const { image, name, about } = user;
 
+  const url = new URL(window.location.href);
+
   const handleNavigate = (path) => () => {
     floatingPanel.navigate(path);
   };
@@ -27,7 +29,7 @@ export default function Settings(props) {
         type: "link",
         label: "appearance",
         Icon: IoMdColorPalette,
-        to: "/personal-chat?show=appearance",
+        to: url.pathname + "?show=appearance",
         onClick: handleNavigate("appearance"),
       },
       {
@@ -66,7 +68,7 @@ export default function Settings(props) {
       {title === "settings" && (
         <Link
           className="setting__link profile"
-          to="/personal-chat?show=profile"
+          to={url.pathname + "?show=profile"}
           onClick={handleNavigate("profile")}
           autoFocus
         >

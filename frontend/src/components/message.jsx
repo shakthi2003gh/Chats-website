@@ -3,12 +3,15 @@ import { useData } from "../state/data";
 import ReadReceipt from "./readReceipt";
 
 export default function Message(props) {
-  const { _id, text, image, author, createdAt, readReceipt, ...rest } = props;
+  const { _id, text, image, author, createdAt, ...r } = props;
+  const { readReceipt, currentChatType, ...rest } = r;
 
   const { user } = useUser();
   const { resendMessage } = useData();
   const author_id = author?._id;
   const author_name = author?.name;
+  const isSelf = author_id === user._id;
+  const isGroupChat = currentChatType === "group-chat";
 
   const formatTime = (date) => {
     if (!date) return "No Date";
@@ -20,21 +23,21 @@ export default function Message(props) {
   };
 
   const handleResend = () => {
-    resendMessage({ temp_id: _id, text, image, author });
+    resendMessage(currentChatType)({ temp_id: _id, text, image, author });
   };
 
-  const className = (id) => (id === user._id ? " send" : " received");
+  const className = isSelf ? " send" : " received";
   const displayImage =
     image && typeof image === "object" ? image.string : image;
 
   return (
     <div
       id={_id}
-      className={"message show" + className(author_id)}
+      className={"message show" + className}
       data-receipt={readReceipt || "sending"}
       {...rest}
     >
-      {false && <span className="name">{author_name}</span>}
+      {isGroupChat && !isSelf && <span className="name">{author_name}</span>}
 
       <div className="container">
         {displayImage && (

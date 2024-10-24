@@ -10,7 +10,10 @@ import { useUser } from "../state/user";
 import Button from "./button";
 import { Input } from "./inputGroup";
 
-export default function ComposeArea({ chat_id, receiver_id, scrollToBottom }) {
+export default function ComposeArea(props) {
+  const { chat_id, receiver_id, scrollToBottom, ...rest } = props;
+  const { chatType, canUploadImage = true } = rest;
+
   const ref = useRef(null);
   const imageRef = useRef(null);
   const { theme } = useUI();
@@ -67,7 +70,7 @@ export default function ComposeArea({ chat_id, receiver_id, scrollToBottom }) {
     }
 
     setText("");
-    sendMessage(payload);
+    sendMessage(chatType)(payload);
     ref.current.querySelector("input#message").focus();
     scrollToBottom();
   };
@@ -84,31 +87,33 @@ export default function ComposeArea({ chat_id, receiver_id, scrollToBottom }) {
 
   return (
     <div ref={ref} className="compose-area">
-      <div className="selected-image">
-        {image && <img src={image} alt="selected image" />}
+      {canUploadImage && (
+        <div className="selected-image">
+          {image && <img src={image} alt="selected image" />}
 
-        <input
-          ref={imageRef}
-          type="file"
-          id="image"
-          name="message image"
-          accept="image/*"
-          onChange={handleImageSelected}
-          hidden
-        />
+          <input
+            ref={imageRef}
+            type="file"
+            id="image"
+            name="message image"
+            accept="image/*"
+            onChange={handleImageSelected}
+            hidden
+          />
 
-        <span>Selected image</span>
+          <span>Selected image</span>
 
-        <Button
-          title="Remove"
-          className="trash"
-          color="danger"
-          onClick={handleRemoveImage}
-        >
-          <FaTrash />
-          <span>remove</span>
-        </Button>
-      </div>
+          <Button
+            title="Remove"
+            className="trash"
+            color="danger"
+            onClick={handleRemoveImage}
+          >
+            <FaTrash />
+            <span>remove</span>
+          </Button>
+        </div>
+      )}
 
       <form id="compose-area" className="main" onSubmit={handleSubmit}>
         <Button
@@ -129,15 +134,17 @@ export default function ComposeArea({ chat_id, receiver_id, scrollToBottom }) {
           onFocus={toggleShowEmoji(false)}
         />
 
-        <Button
-          type="button"
-          title={!image ? "Image" : "Remove image to add new image"}
-          className="image"
-          onClick={handleSelectImage}
-          disabled={!!image}
-        >
-          <FaRegImage />
-        </Button>
+        {canUploadImage && (
+          <Button
+            type="button"
+            title={!image ? "Image" : "Remove image to add new image"}
+            className="image"
+            onClick={handleSelectImage}
+            disabled={!!image}
+          >
+            <FaRegImage />
+          </Button>
+        )}
 
         <Button title="Send" className="send" disabled={!(text || image)}>
           <IoSend />

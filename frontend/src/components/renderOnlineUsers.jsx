@@ -11,7 +11,7 @@ export default function RenderOnlineUsers({ data }) {
         const handleClick = () => {
           if (chat.current?._id === _id) return;
 
-          chat.setCurrent({ _id });
+          chat.setCurrent({ _id, type: "personal-chat" });
           chat.toggleShowContact(false);
         };
 
