@@ -37,6 +37,7 @@ export function MobileHeader() {
 
 export function PanelHeader({ type, title }) {
   const { mediaQuery, floatingPanel, chat } = useUI();
+  const { isSmall, isSmaller } = mediaQuery || {};
 
   const mainPanel = ["personal-chat", "group-chat", "calls"];
   const isMainPanel = mainPanel.includes(type);
@@ -59,10 +60,10 @@ export function PanelHeader({ type, title }) {
     },
   };
 
-  if (mediaQuery.isSmaller && isMainPanel) return <MobileHeader />;
+  if (isSmaller && isMainPanel) return <MobileHeader />;
 
   const handleClick = () => {
-    if (type === "contact-info") return chat.toggleShowContact(false);
+    if (type === "chat-info") return chat.toggleShowInfo(false);
 
     floatingPanel.navigate(actionBtn?.[type]?.location || type);
   };
@@ -71,9 +72,11 @@ export function PanelHeader({ type, title }) {
     history.back();
   };
 
+  const showBackButton = type === "chat-info" ? isSmall : isSmaller;
+
   return (
     <header className="panel-header">
-      {mediaQuery.isSmaller && (
+      {showBackButton && (
         <Button className="back" onClick={handleBack} title="Back">
           <IoArrowBackSharp />
         </Button>
@@ -81,7 +84,7 @@ export function PanelHeader({ type, title }) {
 
       {React.createElement(heading.tag, null, heading.title)}
 
-      {!mediaQuery.isSmaller && (
+      {!showBackButton && (
         <Button
           title={actionBtn?.[type]?.title || "Close"}
           className={actionBtn?.[type]?.className || "close-icon"}

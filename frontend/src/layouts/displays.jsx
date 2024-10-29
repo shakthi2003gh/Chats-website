@@ -9,7 +9,7 @@ import ListPanel from "./listPanel";
 import NewGroup from "./newGroup";
 import Profile from "./profile";
 import Settings from "./settings";
-import ContactInfo from "./contactInfo";
+import ChatInfo from "./chatInfo";
 
 export function Display1() {
   const { panel, floatingPanel, mediaQuery, accessibility } = useUI();
@@ -105,9 +105,9 @@ export function Display2() {
     <div className="display-2">
       {!!chat.current ? (
         <>
-          <Chat inert={accessibility.isContactOpen} />
+          <Chat inert={accessibility.isChatInfoOpen} />
 
-          {chat.current?.showContact && <ContactInfo />}
+          {chat.current?.showInfo && <ChatInfo />}
         </>
       ) : (
         <section className="welcome">

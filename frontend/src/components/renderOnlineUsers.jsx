@@ -12,7 +12,7 @@ export default function RenderOnlineUsers({ data }) {
           if (chat.current?._id === _id) return;
 
           chat.setCurrent({ _id, type: "personal-chat" });
-          chat.toggleShowContact(false);
+          chat.toggleShowInfo(false);
         };
 
         return (

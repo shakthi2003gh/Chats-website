@@ -45,8 +45,8 @@ export default function Chat({ ...rest }) {
     if (showScrollBtn) setShowScrollBtn(false);
   };
 
-  const handleOpenContact = () => {
-    chat.toggleShowContact(true);
+  const handleOpenChatInfo = () => {
+    chat.toggleShowInfo(true);
   };
 
   const handleClose = () => {
@@ -66,6 +66,8 @@ export default function Chat({ ...rest }) {
     return group;
   };
 
+  const chatInfoTitle =
+    currentChatType === "personal-chat" ? "Contact info" : "Group info";
   const groupedMessages = messages.reduce(handleGroupUp, {});
   const composeProps = {
     [isNew ? "receiver_id" : "chat_id"]: _id,
@@ -74,7 +76,7 @@ export default function Chat({ ...rest }) {
     chatType: currentChatType,
   };
   const menuOptions = [
-    <button onClick={handleOpenContact}>contact info</button>,
+    <button onClick={handleOpenChatInfo}>{chatInfoTitle}</button>,
     <button onClick={handleClose}>close</button>,
   ];
 
@@ -134,10 +136,10 @@ export default function Chat({ ...rest }) {
           image={image}
           placeholder={name}
           isOnline={isUserOnline}
-          onClick={handleOpenContact}
+          onClick={handleOpenChatInfo}
         />
 
-        <span className="title name" onClick={handleOpenContact}>
+        <span className="title name" onClick={handleOpenChatInfo}>
           {name}
         </span>
 

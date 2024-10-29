@@ -29,7 +29,7 @@ export default function ChatLink(props) {
     if (chat.current?._id === _id) return;
 
     chat.setCurrent({ _id, type });
-    chat.toggleShowContact(false);
+    chat.toggleShowInfo(false);
   };
 
   const classObj = {

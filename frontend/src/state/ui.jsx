@@ -37,8 +37,8 @@ export default function UIProvider({ children }) {
   const isSmallDevice = !useMediaQuery(678);
   const isFloatingPanelOpen = FloatingPanel ? "true" : undefined;
   const isChatOpen = isSmallDevice ? currentChat && "true" : undefined;
-  const isContactOpen =
-    !useMediaQuery(1111) && currentChat?.showContact ? "true" : undefined;
+  const isChatInfoOpen =
+    !useMediaQuery(1111) && currentChat?.showInfo ? "true" : undefined;
 
   const navigate = (panel, changeURL = false, replace = false) => {
     if (!panels.includes(panel)) return;
@@ -68,13 +68,13 @@ export default function UIProvider({ children }) {
     const panel = path.split("/")[1];
     const chat_id = path.split("/")[2];
     const floatingPanel = url.searchParams.get("show");
-    const showContact = chat_id && !!url.searchParams.get("contact-info");
+    const showInfo = chat_id && !!url.searchParams.get("chat-info");
     const id = panel === "new-chat" ? "user_id" : "_id";
     const type = panel;
 
     navigate(panel || panels[0]);
     setCurrentFloatingPanel(floatingPanel);
-    setCurrentChat(chat_id ? { [id]: chat_id, showContact, type } : null);
+    setCurrentChat(chat_id ? { [id]: chat_id, showInfo, type } : null);
   };
 
   const themeToggle = () => {
@@ -96,16 +96,16 @@ export default function UIProvider({ children }) {
     document.body.setAttribute("color", color);
   };
 
-  const toggleShowContact = (showContact) => {
+  const toggleShowInfo = (showInfo) => {
     setCurrentChat((prev) => {
       const url = new URL(window.location.href);
-      const show = showContact ?? !prev;
+      const show = showInfo ?? !prev;
 
-      if (show) url.searchParams.set("contact-info", show);
-      else url.searchParams.delete("contact-info");
+      if (show) url.searchParams.set("chat-info", show);
+      else url.searchParams.delete("chat-info");
 
-      urlNavigation(url.pathname + url.search, isSmallDevice);
-      return { ...prev, showContact: show };
+      urlNavigation(url.pathname + url.search);
+      return { ...prev, showInfo: show };
     });
   };
 
@@ -120,14 +120,14 @@ export default function UIProvider({ children }) {
     return () => window.removeEventListener("popstate", handleNavigation);
   }, []);
 
-  const contact = { toggleShowContact };
+  const info = { toggleShowInfo };
   const theme = { isDark, isLight: !isDark, toggle: themeToggle };
   const color = { list: colors, current: currentColor, setColor };
   const panel = { current: currentPanel, navigate };
   const floatingPanel = { current: FloatingPanel, navigate: navigateFloating };
-  const chat = { current: currentChat, setCurrent: setCurrentChat, ...contact };
+  const chat = { current: currentChat, setCurrent: setCurrentChat, ...info };
   const mediaQuery = { isSmaller: isSmallerDevice, isSmall: isSmallDevice };
-  const accessibility = { isFloatingPanelOpen, isChatOpen, isContactOpen };
+  const accessibility = { isFloatingPanelOpen, isChatOpen, isChatInfoOpen };
 
   const displayOne = { panel, floatingPanel };
   const settings = { theme, color };
