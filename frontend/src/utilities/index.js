@@ -11,7 +11,7 @@ export function classes(classObject, className = "") {
 export function navigate(to, replace = false) {
   const url = window.location.pathname;
   const params = new URL(window.location.href).search;
-  const path = to[0] !== "/" ? "/" + to : to;
+  const path = to?.[0] !== "/" ? "/" + to : to;
   const method = !!replace ? "replaceState" : "pushState";
 
   if (url + params === path) return;

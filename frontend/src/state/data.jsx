@@ -134,12 +134,26 @@ export default function DataProvider({ children }) {
     setPeople(filteredUser);
   };
 
+  const getPeople = () => {
+    setLoading(true);
+
+    PublicHTTP.getPeople()
+      .then(handleSetPeople)
+      .finally(() => setLoading(false));
+  };
+
   const getChat = () => {
     const { _id: id, user_id, type } = chat.current;
 
     const findUser = ({ _id }) => _id === user_id;
     const findChat = ({ _id, user_id }) => id === _id || id === user_id;
-    const newChat = () => ({ ...people.find(findUser), isNew: true });
+    const newChat = () => {
+      const user = people.find(findUser);
+      if (user) return { ...user, isNew: true };
+
+      chat.setCurrent(null);
+      return {};
+    };
 
     if (type === "group-chat") return groupChats.find(findChat);
     return personalChats.find(findChat) || newChat();
@@ -383,15 +397,14 @@ export default function DataProvider({ children }) {
     if (!isOnline) return;
     if (currentFloatingPanel !== "new-chat") return;
 
-    setLoading(true);
-    PublicHTTP.getPeople()
-      .then(handleSetPeople)
-      .finally(() => setLoading(false));
+    getPeople();
   }, [isOnline, currentFloatingPanel]);
 
   useEffect(() => {
     chatsLocalDB.getChats().then(setChats);
     chatsLocalDB.getChats("groupChats").then(setGroups);
+
+    if (isOnline) getPeople();
   }, []);
 
   const m = { handleReceiveMessage, reset: handleReset, updateMessageStatus };

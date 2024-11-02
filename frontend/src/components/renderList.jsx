@@ -4,7 +4,7 @@ import UserLink from "./userLink";
 import useObserver from "../hooks/useObserver";
 
 function RenderList(Link) {
-  return function ({ type = "#", list = [], loading }) {
+  return function ({ type, list = [], loading }) {
     const listRef = useRef();
     const listLength = list.length;
 

@@ -70,7 +70,7 @@ export default function UIProvider({ children }) {
     const floatingPanel = url.searchParams.get("show");
     const showInfo = chat_id && !!url.searchParams.get("chat-info");
     const id = panel === "new-chat" ? "user_id" : "_id";
-    const type = panel;
+    const type = panel === "new-chat" ? "personal-chat" : panel;
 
     navigate(panel || panels[0]);
     setCurrentFloatingPanel(floatingPanel);
