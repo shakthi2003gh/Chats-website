@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { navigate as urlNavigation } from "../utilities";
+import { usePopup } from "../layouts/popup";
 import useMediaQuery from "../hooks/useMediaQuery";
 
 const colors = ["pink", "green", "yellow", "blue"];
@@ -28,6 +29,8 @@ export function useUI() {
 }
 
 export default function UIProvider({ children }) {
+  const { close: closePopup } = usePopup();
+
   const [isDark, setDark] = useState(InitialTheme === "dark");
   const [currentColor, setCurrentColor] = useState(InitialColor || colors[0]);
   const [currentPanel, setCurrentPanel] = useState(panels[0]);
@@ -75,6 +78,7 @@ export default function UIProvider({ children }) {
     navigate(panel || panels[0]);
     setCurrentFloatingPanel(floatingPanel);
     setCurrentChat(chat_id ? { [id]: chat_id, showInfo, type } : null);
+    if (window.popupOpen) closePopup();
   };
 
   const themeToggle = () => {

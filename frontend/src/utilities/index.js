@@ -15,7 +15,7 @@ export function navigate(to, replace = false) {
   const method = !!replace ? "replaceState" : "pushState";
 
   if (url + params === path) return;
-  window.history[method]("", "", path);
+  window.history[method](null, "", path);
 }
 
 export const formatTime = (date, today = "") => {

@@ -3,7 +3,7 @@ import { FaMobile, FaDesktop, FaTabletAlt, FaTv } from "react-icons/fa";
 import { FaEdge, FaChrome, FaFirefox } from "react-icons/fa";
 import { GiConsoleController } from "react-icons/gi";
 import { RiErrorWarningLine } from "react-icons/ri";
-import { formatTime } from "../utilities";
+import { formatTime, navigate } from "../utilities";
 import { Input } from "../components/inputGroup";
 import Button from "../components/button";
 import RenderPeopleList from "../components/renderPeopleList";
@@ -24,10 +24,19 @@ export default function PopupProvider({ children }) {
   const [data, setData] = useState(null);
   const [event, setEvent] = useState(initialEvent);
 
+  const updateURL = (open = false) => {
+    const url = new URL(window.location.href);
+    url.searchParams[open ? "set" : "delete"]("popup", open || undefined);
+    navigate(url.pathname + url.search, !open);
+  };
+
   const handleClose = () => {
+    window.popupOpen = false;
     setShow(false);
     setData(null);
     setEvent(initialEvent);
+
+    updateURL();
   };
 
   const handleCancel = (e) => {
@@ -38,10 +47,13 @@ export default function PopupProvider({ children }) {
   };
 
   const display = ({ type, data, onConfirm }) => {
+    window.popupOpen = true;
     setShow(true);
     setType(type);
     setData(data);
     setEvent({ onConfirm, handleClose });
+
+    updateURL(true);
   };
 
   useEffect(() => {
@@ -60,9 +72,10 @@ export default function PopupProvider({ children }) {
 
   const Container = containers[type];
   const props = { data, event };
+  const state = { display, isShowPopup: show, close: handleClose };
 
   return (
-    <PopupContext.Provider value={{ display, isShowPopup: show }}>
+    <PopupContext.Provider value={state}>
       {children}
 
       {show && (
