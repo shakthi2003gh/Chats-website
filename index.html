@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chats - Messaging WebApp</title>
+  <link rel="manifest" href="./manifest.json">
+  <meta name="description" content="Chats chatting webapp to connect with people.">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1a1a1a" />
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./serviceWorker.js', { scope: "./" })
+      })
+    } else {
+      console.log("service worker not available.");
+    }
+  </script>
+  <script type="module" crossorigin src="/assets/index-8ac0d380.js"></script>
+  <link rel="stylesheet" href="/assets/index-71a71f71.css">
+</head>
+
+<body>
+  <div id="root"></div>
+  
+</body>
+
+</html>
