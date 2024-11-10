@@ -403,14 +403,12 @@ export default function DataProvider({ children }) {
   useEffect(() => {
     chatsLocalDB.getChats().then(setChats);
     chatsLocalDB.getChats("groupChats").then(setGroups);
-
-    if (isOnline) getPeople();
   }, []);
 
   const m = { handleReceiveMessage, reset: handleReset, updateMessageStatus };
   const methods = { getChat, createGroup, sendMessage, resendMessage, ...m };
   const chats = { personalChats, groupChats, setPersonalChats, setGroupChats };
-  const state = { chats, people, isLoading, ...methods };
+  const state = { chats, people, getPeople, isLoading, ...methods };
 
   return <DataContext.Provider value={state}>{children}</DataContext.Provider>;
 }

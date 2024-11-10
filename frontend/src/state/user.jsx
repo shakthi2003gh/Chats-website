@@ -17,7 +17,7 @@ export function useUser() {
 export default function UserProvider({ children }) {
   const { reset: UIReset } = useUI();
   const { isOnline, wsRef } = useNetwork();
-  const { chats, reset: DataReset } = useData();
+  const { chats, getPeople, reset: DataReset } = useData();
   const { display } = usePopup();
   const [user, setUser] = useState(null);
   const [email, setEmail] = useState("");
@@ -55,6 +55,7 @@ export default function UserProvider({ children }) {
         setuser(user);
         setPersonalChats(chat.personal, true);
         setGroupChats(chat.group, true);
+        getPeople();
       })
       .catch((data) => {
         if (typeof data === "string" && data === networkErrorMsg) return;
