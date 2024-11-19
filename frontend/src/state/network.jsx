@@ -100,11 +100,10 @@ export default function NetworkProvider({ children }) {
 
   const handleConnection = (receiver) => {
     if (wsRef.current) return;
-    const promise = connection(handleReconnect());
-
-    wsRef.current = promise;
     receiverRef.current = receiver;
 
+    const promise = connection(handleReconnect());
+    wsRef.current = promise;
     return promise;
   };
 
