@@ -4,13 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon --trace-warnings index.js"
+    "start": "node dist/index.js",
+    "dev": "nodemon --trace-warnings index.js",
+    "build": "webpack"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0",
+    "babel-loader": "^9.2.1",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
@@ -24,6 +28,9 @@
     "mongoose": "^8.3.2",
     "nodemailer": "^6.9.13",
     "ua-parser-js": "^1.0.38",
+    "webpack": "^5.96.1",
+    "webpack-cli": "^5.1.4",
+    "webpack-node-externals": "^3.0.0",
     "ws": "^8.17.0"
   },
   "devDependencies": {

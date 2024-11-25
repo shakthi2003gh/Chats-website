@@ -9,4 +9,4 @@ router.get("/users", async (req, res) => {
   res.send(users);
 });
 
-exports.public = router;
+exports.people = router;
